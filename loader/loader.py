@@ -25,9 +25,21 @@ class Loader():
 
     def run(self):
         for load in self.configuration:
+            # Preprocess load at interface level
+            # Allow loading all cores with "all"
+            if load["target_cores"] == "all":
+                load["target_cores"] = []
+                for i in range(self.physical_cores):
+                    load["target_cores"].append(i+1)
+            # Allow setting one load for the selected cores
+            if not isinstance(load["target_loads"], list):
+                value = load["target_loads"]
+                load["target_loads"] = []
+                for i in range(len(load["target_cores"])):
+                    load["target_loads"].append(value)
             self.send_event(type = "start", **load)
 
-            # Preprocess load
+            # Preprocess load at working level
             target_cores = []
             target_loads = []
             duration = load["duration"]

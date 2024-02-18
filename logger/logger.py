@@ -12,7 +12,7 @@ class Logger():
 
         self.file = open(OUTPUT_DIR + configuration["file_name"], "w", newline="")
         self.writer = csv.writer(self.file, delimiter=',')
-        self.stop_time = time.time() + configuration["duration"]
+        self.stop_time = time.time() + configuration["duration"] + 0.1 # Some wait time for concluding messages
 
         self.header_written = False
 
