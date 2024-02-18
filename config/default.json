@@ -1,0 +1,18 @@
+{
+    "loader":[
+        {
+            "target_cores": [1, 2, 3, 4, 5, 6],
+            "target_loads": [0, 0, 0, 0, 0, 0],
+            "duration": 5,
+            "sampling_interval": 0.1
+        }
+    ],
+    "sensor": {
+        "duration": 5,
+        "sampling_interval": 0.5
+    },
+    "logger": {
+        "file_name": "data.csv",
+        "duration": 5
+    }
+}
