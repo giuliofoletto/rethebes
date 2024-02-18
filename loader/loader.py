@@ -26,30 +26,23 @@ class Loader():
             self.send_event(type = "start", **load)
 
             # Preprocess load
-            target_cores = load["target_cores"]
-            target_loads = load["target_loads"]
+            target_cores = []
+            target_loads = []
             duration = load["duration"]
             sampling_interval = load["sampling_interval"]
-            try:
-                _ = iter(target_cores)
-            except TypeError:
-                target_cores = list(target_cores)
-            try:
-                _ = iter(target_loads)
-            except TypeError:
-                target_loads = list(target_loads)
-            # Internally, cores are grouped as two
+            
+            # Internally, cores are grouped as two due to hyperthreading
             # At interface level, we want 1-6
-            for i in range(len(target_cores)):
-                target_cores[i] = 2*(target_cores[i]-1)
-            # Internally, we want numbers between 0-2
-            # At interface level, we want %
-            for i in range(len(target_loads)):
-                # Single threaded performance
-                # Does not coincide with LHM percentage which accounts for hyperthreading
-                # That is, 50% LHM means full core utilization by a single thread
-                # The same thing is called 100% here
-                target_loads[i] = target_loads[i]*1/100
+            # We load a process for each of the two logical threads of each core
+            for i in range(len(load["target_cores"])):
+                target_cores.append(2*(load["target_cores"][i]-1))
+                target_cores.append(2*(load["target_cores"][i]-1) + 1)
+
+            for i in range(len(load["target_loads"])):
+                # We attribute the requested load to each of the two logical threads
+                # Recent LHM reports load per thread, so this is consistent
+                target_loads.append(load["target_loads"][i]*1/100)
+                target_loads.append(load["target_loads"][i]*1/100)
 
             with multiprocessing.Pool(len(target_cores)) as pool:
                 pool.starmap(load_core, zip(
