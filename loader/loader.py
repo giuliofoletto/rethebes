@@ -19,7 +19,9 @@ class Loader():
     def __init__(self, configuration, event_queue):
         self.configuration = configuration
         self.event_queue = event_queue
-
+        self.physical_cores = psutil.cpu_count(logical=False)
+        self.logical_cores = psutil.cpu_count(logical=True)
+        self.hyperthreading = self.logical_cores // self.physical_cores
 
     def run(self):
         for load in self.configuration:
@@ -35,14 +37,14 @@ class Loader():
             # At interface level, we want 1-6
             # We load a process for each of the two logical threads of each core
             for i in range(len(load["target_cores"])):
-                target_cores.append(2*(load["target_cores"][i]-1))
-                target_cores.append(2*(load["target_cores"][i]-1) + 1)
+                for j in range(self.hyperthreading):
+                    target_cores.append(2*(load["target_cores"][i]-1) + j)
 
             for i in range(len(load["target_loads"])):
                 # We attribute the requested load to each of the two logical threads
                 # Recent LHM reports load per thread, so this is consistent
-                target_loads.append(load["target_loads"][i]*1/100)
-                target_loads.append(load["target_loads"][i]*1/100)
+                for j in range(self.hyperthreading):
+                    target_loads.append(load["target_loads"][i]*1/100)
 
             with multiprocessing.Pool(len(target_cores)) as pool:
                 pool.starmap(load_core, zip(
