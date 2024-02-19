@@ -26,12 +26,7 @@ class CPU:
                 stype = str(self.hw.Sensors[index].SensorType)
             except IndexError:
                 break
-            if stype == "Load" and ("CPU Core #" in name or "CPU Total" in name):
-                self.sensors[stype + " " + name] = index
-            elif stype == "Temperature" and "Distance" not in name and "Max" not in name and "Average" not in name:
-                self.sensors[stype + " " + name] = index
-            elif stype == "Clock" and "CPU Core" in name:
-                self.sensors[stype + " " + name] = index
-            elif stype == "Power" and ("Cores" in name or "Package" in name):
-                self.sensors[stype + " " + name] = index
+            # Accept all sensors
+            # But here is where we could put some rules to discard some
+            self.sensors[stype + " " + name] = index
             index += 1
