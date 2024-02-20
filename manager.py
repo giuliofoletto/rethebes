@@ -18,6 +18,9 @@ class Manager():
         for slave in ["sensor", "logger"]:
             if "duration" not in self.configuration[slave] or self.configuration[slave]["duration"] == "auto":
                 self.configuration[slave]["duration"] = master_duration
+        # Allow auto setting of file name
+        if "file_name" not in self.configuration["logger"] or self.configuration["logger"]["file_name"] == "auto":
+            self.configuration["logger"]["file_name"] = datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
 
         self.loader = Loader(self.configuration["loader"], self.event_queue)
         self.t_loader = Thread(target = self.loader.run)
