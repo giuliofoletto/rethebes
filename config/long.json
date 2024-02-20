@@ -1,0 +1,136 @@
+{
+    "loader":[
+        {
+            "target_cores": "all",
+            "target_loads": 0,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 10,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 20,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 30,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 40,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 50,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 60,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 70,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 80,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 90,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 100,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 90,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 80,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 70,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 60,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 50,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 40,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 30,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 20,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 10,
+            "duration": 30,
+            "sampling_interval": 0.1
+        },
+        {
+            "target_cores": "all",
+            "target_loads": 0,
+            "duration": 30,
+            "sampling_interval": 0.1
+        }
+    ],
+    "sensor": {
+        "sampling_interval": 0.5
+    },
+    "logger": {
+        "file_name": "auto"
+    }
+}

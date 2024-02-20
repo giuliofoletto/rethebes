@@ -1,0 +1,16 @@
+{
+    "loader":[
+        {
+            "target_cores": "all",
+            "target_loads": 30,
+            "duration": 1,
+            "sampling_interval": 0.1
+        }
+    ],
+    "sensor": {
+        "sampling_interval": 0.1
+    },
+    "logger": {
+        "file_name": "auto"
+    }
+}
