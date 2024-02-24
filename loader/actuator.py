@@ -1,20 +1,13 @@
 """
-Part of ...
+Part of the module that loads CPU cores, this class generates CPU load by tuning the sleep time.
+Based on https://github.com/GaetanoCarlucci/CPULoadGenerator/ 
 
-Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto
+Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 """
 
-import os
 import time
 
-import psutil
-
-
 class Actuator:
-    """
-        Generates CPU load by tuning the sleep time
-    """
-
     def __init__(self, controller, monitor, duration, target):
         self.controller = controller
         self.monitor = monitor

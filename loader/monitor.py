@@ -1,20 +1,16 @@
 """
-Part of ...
+Part of the module that loads CPU cores, this class monitors the CPU status.
+Based on https://github.com/GaetanoCarlucci/CPULoadGenerator/ 
 
-Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto
+Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 """
 
 import os
-import psutil
 from threading import Thread, Event, RLock
 import time
-
+import psutil
 
 class MonitorThread(Thread):
-    """
-       Monitors the CPU status
-    """
-
     def __init__(self, cpu_core, interval):
         # synchronization
         self.shutdown_flag = Event()

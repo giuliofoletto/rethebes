@@ -1,18 +1,23 @@
+"""
+Module that uses LibreHardwareMonitor to read status of CPU.
+
+Authors: Giulio Foletto.
+"""
 import datetime
+import time
+import sys
+import csv
+import zmq
 import clr
 from .cpu import CPU
-import sys
+
 sys.path.append("./sensor/lib")
 clr.AddReference('LibreHardwareMonitorLib')
 from LibreHardwareMonitor import Hardware
-import time
-import csv
-import zmq
 
 OUTPUT_DIR = "./output/"
 
 class Sensor():
-
     def __init__(self, configuration, context):
 
         self.sampling_interval = configuration["sampling_interval"]

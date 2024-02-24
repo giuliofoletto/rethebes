@@ -1,7 +1,10 @@
 """
+Holder for CPU sensors.
 Note: to find out the correct indexes of the sensor use
 for i in range(50): # arbitrary big number
     print(i, self.hw.Sensors[i].Name, self.hw.Sensors[i].SensorType)
+
+Authors: Giulio Foletto.
 """
 
 class CPU:

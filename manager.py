@@ -1,9 +1,15 @@
+"""
+Core logic singlet.
+
+Authors: Giulio Foletto.
+"""
+
 from threading import Thread
+import datetime
+import zmq
 from loader import Loader
 from sensor import Sensor
 from logger import Logger
-import datetime
-import zmq
 
 class Manager():
     def __init__(self, configuration):

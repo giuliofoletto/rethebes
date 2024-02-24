@@ -1,4 +1,9 @@
-import time
+"""
+Module that logs messages sent by other modules.
+
+Authors: Giulio Foletto.
+"""
+
 import json
 import zmq
 

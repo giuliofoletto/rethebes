@@ -1,17 +1,15 @@
 """
-Part of ...
+Part of the module that loads CPU cores, this class controls the CPU status.
+Based on https://github.com/GaetanoCarlucci/CPULoadGenerator/ 
 
-Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto
+Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 """
+
 from threading import Thread, Event, RLock
 import time
 
 
 class ControllerThread(Thread):
-    """
-        Controls the CPU status
-    """
-
     def __init__(self, interval, ki=None, kp=None):
         # synchronization
         self.shutdown_flag = Event()

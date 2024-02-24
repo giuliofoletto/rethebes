@@ -1,20 +1,19 @@
 """
-Part of ...
+Module that loads CPU cores.
+Based on https://github.com/GaetanoCarlucci/CPULoadGenerator/ 
 
-Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto
+Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 """
 
 import os
-import psutil
+import multiprocessing
+import datetime
 import itertools
+import psutil
 import zmq
-
 from .actuator import Actuator
 from .controller import ControllerThread
 from .monitor import MonitorThread
-
-import multiprocessing
-import datetime
 
 class Loader():
     def __init__(self, configuration, context):
