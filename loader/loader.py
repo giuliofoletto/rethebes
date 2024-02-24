@@ -7,6 +7,7 @@ Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto
 import os
 import psutil
 import itertools
+import zmq
 
 from .actuator import Actuator
 from .controller import ControllerThread
@@ -16,9 +17,12 @@ import multiprocessing
 import datetime
 
 class Loader():
-    def __init__(self, configuration, event_queue):
+    def __init__(self, configuration, context):
         self.configuration = configuration
-        self.event_queue = event_queue
+        self.context = context
+        self.socket = self.context.socket(zmq.PAIR)
+        self.socket.connect("inproc://manager-loader")
+
         self.physical_cores = psutil.cpu_count(logical=False)
         self.logical_cores = psutil.cpu_count(logical=True)
         self.hyperthreading = self.logical_cores // self.physical_cores
@@ -37,7 +41,7 @@ class Loader():
                 load["target_loads"] = []
                 for i in range(len(load["target_cores"])):
                     load["target_loads"].append(value)
-            self.send_event(type = "start", **load)
+            self.send_event(command = "start", **load)
 
             # Preprocess load at working level
             target_cores = []
@@ -65,14 +69,15 @@ class Loader():
                     itertools.repeat(duration),
                     itertools.repeat(sampling_interval)
                 ))
-            self.send_event(type = "stop", **load)
+            self.send_event(command = "stop", **load)
+        self.send_event(command = "finish")
     
     def send_event(self, **kwargs):
         event = dict()
         event["header"] = "loader-event"
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = kwargs
-        self.event_queue.put(event)
+        self.socket.send_json(event)
             
 
 def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):

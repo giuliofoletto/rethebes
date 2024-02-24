@@ -7,12 +7,13 @@ clr.AddReference('LibreHardwareMonitorLib')
 from LibreHardwareMonitor import Hardware
 import time
 import csv
+import zmq
 
 OUTPUT_DIR = "./output/"
 
 class Sensor():
 
-    def __init__(self, configuration, event_queue):
+    def __init__(self, configuration, context):
 
         self.duration = configuration["duration"]
         self.sampling_interval = configuration["sampling_interval"]
@@ -22,7 +23,9 @@ class Sensor():
         self.writer = csv.writer(self.file, delimiter=',')
         self.header_written = False
 
-        self.event_queue = event_queue
+        self.context = context
+        self.socket = self.context.socket(zmq.PAIR)
+        self.socket.connect("inproc://manager-sensor")
 
         self.pc = Hardware.Computer()
         self.pc.IsCpuEnabled=True
@@ -47,5 +50,5 @@ class Sensor():
         event["header"] = "sensor-data"
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = data
-        self.event_queue.put(event)
+        self.socket.send_json(event)
 
