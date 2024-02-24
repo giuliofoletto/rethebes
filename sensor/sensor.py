@@ -26,24 +26,41 @@ class Sensor():
         self.context = context
         self.socket = self.context.socket(zmq.PAIR)
         self.socket.connect("inproc://manager-sensor")
+        self.poller = zmq.Poller()
+        self.poller.register(self.socket, zmq.POLLIN)
 
         self.pc = Hardware.Computer()
         self.pc.IsCpuEnabled=True
         self.pc.Open()
         self.cpu = CPU(self.pc.Hardware[0])
-        
+
+        self.should_continue = True
 
     def run(self):
-        while(time.time() < self.stop_time):
+        while self.should_continue:
+            self.listen(0) # Return immediately
+            if not self.should_continue: # Allow stopping via message
+                break
             stop_period = time.time() + self.sampling_interval
-            values = {"Time": datetime.datetime.now().isoformat()}
-            values.update(self.cpu.read())
-            if not self.header_written:
-                self.writer.writerow(list(values.keys()))
-                self.header_written = True
-            self.writer.writerow(list(values.values()))
-            self.send_data(values)
+            self.act()
             time.sleep(max(0, stop_period-time.time()))
+
+    def act(self):
+        values = {"Time": datetime.datetime.now().isoformat()}
+        values.update(self.cpu.read())
+        if not self.header_written:
+            self.writer.writerow(list(values.keys()))
+            self.header_written = True
+        self.writer.writerow(list(values.values()))
+        self.send_data(values)
+    
+    def listen(self, timeout = None):
+        events = self.poller.poll(timeout)
+        if len(events) > 0:
+            for event in events:
+                if event[0] == self.socket and event[1] == zmq.POLLIN:
+                    message = event[0].recv_json()
+                    self.process_message(message)
 
     def send_data(self, data):
         event = dict()
@@ -52,3 +69,6 @@ class Sensor():
         event["body"] = data
         self.socket.send_json(event)
 
+    def process_message(self, message):
+        if "command" in message["body"] and message["body"]["command"] == "finish":
+            self.should_continue = False

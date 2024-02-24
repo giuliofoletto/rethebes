@@ -41,6 +41,8 @@ class Manager():
         self.t_logger = Thread(target = self.logger.run)
         self.t_logger.start()
 
+        self.sockets = [self.s_loader, self.s_sensor, self.s_logger]
+
         self.should_continue = True
         self.listen()
 
@@ -53,11 +55,20 @@ class Manager():
         while self.should_continue:
             events = self.poller.poll(self.polling_wait_time*1000)
             for event in events:
-                if event[0] in [self.s_loader, self.s_sensor, self.s_logger]:
+                if event[0] in self.sockets:
                     message = event[0].recv_json()
                     self.dispatch(message)
 
+    def send_event(self, **kwargs):
+        event = dict()
+        event["header"] = "manager-event"
+        event["time"] = datetime.datetime.now().isoformat()
+        event["body"] = kwargs
+        for socket in self.sockets:
+            socket.send_json(event)
+    
     def dispatch(self, message):
         if message["header"] == "loader-event" and message["body"]["command"] == "finish":
+            self.send_event(command = "finish")
             self.should_continue = False
         self.s_logger.send_json(message)
