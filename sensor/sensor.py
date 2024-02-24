@@ -6,6 +6,9 @@ sys.path.append("./sensor/lib")
 clr.AddReference('LibreHardwareMonitorLib')
 from LibreHardwareMonitor import Hardware
 import time
+import csv
+
+OUTPUT_DIR = "./output/"
 
 class Sensor():
 
@@ -15,6 +18,9 @@ class Sensor():
         self.sampling_interval = configuration["sampling_interval"]
         self.start_time = time.time()
         self.stop_time = self.start_time + self.duration
+        self.file = open(OUTPUT_DIR + configuration["file_name"], "w", newline="")
+        self.writer = csv.writer(self.file, delimiter=',')
+        self.header_written = False
 
         self.event_queue = event_queue
 
@@ -29,6 +35,10 @@ class Sensor():
             stop_period = time.time() + self.sampling_interval
             values = {"Time": datetime.datetime.now().isoformat()}
             values.update(self.cpu.read())
+            if not self.header_written:
+                self.writer.writerow(list(values.keys()))
+                self.header_written = True
+            self.writer.writerow(list(values.values()))
             self.send_data(values)
             time.sleep(max(0, stop_period-time.time()))
 
