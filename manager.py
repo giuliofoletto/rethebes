@@ -12,13 +12,6 @@ class Manager():
 
         # Preprocess configuration
         self.configuration = configuration
-        # Allow auto setting of duration for slave objects
-        master_duration = 0
-        for load in self.configuration["loader"]:
-            master_duration += load["duration"]
-        for slave in ["sensor", "logger"]:
-            if "duration" not in self.configuration[slave] or self.configuration[slave]["duration"] == "auto":
-                self.configuration[slave]["duration"] = master_duration
         # Allow auto setting of file name
         if "file_name" not in self.configuration["sensor"] or self.configuration["sensor"]["file_name"] == "auto":
             self.configuration["sensor"]["file_name"] = datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"

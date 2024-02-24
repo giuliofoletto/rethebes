@@ -20,11 +20,9 @@
         }
     ],
     "sensor": {
-        "duration": "auto",
         "sampling_interval": 0.1
     },
     "logger": {
-        "file_name": "auto",
-        "duration": "auto"
+        "file_name": "auto"
     }
 }

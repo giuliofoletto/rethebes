@@ -11,14 +11,12 @@ class Logger():
         self.poller = zmq.Poller()
         self.poller.register(self.socket, zmq.POLLIN)
 
-        self.stop_time = time.time() + configuration["duration"] + 0.1 # Some wait time for concluding messages
-
         self.should_continue = True
 
     def run(self):
         print("Program starts - Press CTRL+BREAK to force exit")
         while self.should_continue:
-            self.listen((self.stop_time - time.time())*1000)
+            self.listen()
         print("Program ends normally")
 
     def listen(self, timeout = None):

@@ -15,10 +15,8 @@ class Sensor():
 
     def __init__(self, configuration, context):
 
-        self.duration = configuration["duration"]
         self.sampling_interval = configuration["sampling_interval"]
         self.start_time = time.time()
-        self.stop_time = self.start_time + self.duration
         self.file = open(OUTPUT_DIR + configuration["file_name"], "w", newline="")
         self.writer = csv.writer(self.file, delimiter=',')
         self.header_written = False
