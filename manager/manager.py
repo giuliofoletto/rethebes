@@ -23,9 +23,8 @@ class Manager():
             self.configuration["sensor"]["file_name"] = datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
 
         self.holders = dict()
-        self.holders["loader"] = Holder(Loader, "loader", self.configuration["loader"], self.context)
-        self.holders["sensor"] = Holder(Sensor, "sensor", self.configuration["sensor"], self.context)
-        self.holders["logger"] = Holder(Logger, "logger", self.configuration["logger"], self.context)
+        for instrument in self.configuration:
+            self.holders[instrument] = Holder(instrument, self.configuration[instrument], self.context)
 
         for _, v in self.holders.items():
             v.spawn()
@@ -74,8 +73,8 @@ class Manager():
         return self.should_continue
 
 class Holder():
-    def __init__(self, instrument_class, name, configuration, context):
-        self.instrument_class = instrument_class
+    def __init__(self, name, configuration, context):
+        self.instrument_class = self.factory(name)
         self.name = name
         self.configuration = configuration
         self.context = context
@@ -96,3 +95,13 @@ class Holder():
         self.thread = Thread(target=self.launch)
         self.running = True
         self.thread.start()
+
+    def factory(self, name):
+        if name == "loader":
+            return Loader
+        elif name == "sensor":
+            return Sensor
+        elif name == "logger":
+            return Logger
+        else:
+            raise ValueError("Unknown instrument")
