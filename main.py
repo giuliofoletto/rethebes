@@ -11,7 +11,7 @@ if __name__ == '__main__':
     from manager import Manager
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("--configuration", type = str, default = "./config/default.json", help = "Configuration file")
+    parser.add_argument("-c", "--configuration", type = str, default = "./config/default.json", help = "Configuration file")
     args = parser.parse_args()
 
     with open(args.configuration) as f:
