@@ -5,6 +5,7 @@ Authors: Giulio Foletto.
 """
 
 import json
+import datetime
 import zmq
 
 class Logger():
@@ -17,6 +18,9 @@ class Logger():
         self.poller.register(self.socket, zmq.POLLIN)
 
         self.should_continue = True
+    
+    def __del__(self):
+        self.socket.close()
 
     def run(self):
         print("Program starts - Press CTRL+BREAK to force exit")
@@ -40,7 +44,15 @@ class Logger():
         elif message["header"] == "manager-event":
             if "command" in message["body"] and message["body"]["command"] == "finish":
                 self.should_continue = False
+                self.send_event(command = "finish")
             self.log_message(message)
 
     def log_message(self, message):
         print(message["time"], message["header"], json.dumps(message["body"]))
+
+    def send_event(self, **kwargs):
+        event = dict()
+        event["header"] = "logger-event"
+        event["time"] = datetime.datetime.now().isoformat()
+        event["body"] = kwargs
+        self.socket.send_json(event)

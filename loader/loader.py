@@ -26,6 +26,9 @@ class Loader():
         self.logical_cores = psutil.cpu_count(logical=True)
         self.hyperthreading = self.logical_cores // self.physical_cores
 
+    def __del__(self):
+        self.socket.close()
+
     def run(self):
         for load in self.configuration:
             # Preprocess load at interface level

@@ -39,6 +39,9 @@ class Sensor():
 
         self.should_continue = True
 
+    def __del__(self):
+        self.socket.close()
+
     def run(self):
         while self.should_continue:
             self.listen(0) # Return immediately
@@ -72,6 +75,14 @@ class Sensor():
         event["body"] = data
         self.socket.send_json(event)
 
+    def send_event(self, **kwargs):
+        event = dict()
+        event["header"] = "sensor-event"
+        event["time"] = datetime.datetime.now().isoformat()
+        event["body"] = kwargs
+        self.socket.send_json(event)
+
     def process_message(self, message):
         if "command" in message["body"] and message["body"]["command"] == "finish":
             self.should_continue = False
+            self.send_event(command = "finish")
