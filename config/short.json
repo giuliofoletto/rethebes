@@ -2,7 +2,7 @@
     "loader":[
         {
             "target_cores": "all",
-            "target_loads": 30,
+            "target_loads": 0,
             "duration": 1,
             "sampling_interval": 0.1
         }
