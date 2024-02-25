@@ -11,18 +11,14 @@ import zmq
 import clr
 from .cpu import CPU
 
-sys.path.append("./sensor/lib")
-clr.AddReference('LibreHardwareMonitorLib')
-from LibreHardwareMonitor import Hardware
-
 OUTPUT_DIR = "./output/"
 
 class Sensor():
     def __init__(self, configuration, context):
-
-        self.sampling_interval = configuration["sampling_interval"]
+        self.configuration = configuration
+        self.sampling_interval = self.configuration["sampling_interval"]
         self.start_time = time.time()
-        self.file = open(OUTPUT_DIR + configuration["file_name"], "w", newline="")
+        self.file = open(OUTPUT_DIR + self.configuration["file_name"], "w", newline="")
         self.writer = csv.writer(self.file, delimiter=',')
         self.header_written = False
 
@@ -32,6 +28,11 @@ class Sensor():
         self.poller = zmq.Poller()
         self.poller.register(self.socket, zmq.POLLIN)
 
+        if "lhm_path" in self.configuration:
+            sys.path.append(self.configuration["lhm_path"])
+        clr.AddReference('LibreHardwareMonitorLib')
+        from LibreHardwareMonitor import Hardware
+        
         self.pc = Hardware.Computer()
         self.pc.IsCpuEnabled=True
         self.pc.Open()
