@@ -5,23 +5,15 @@ Authors: Giulio Foletto.
 """
 
 import json
-import datetime
 import zmq
+from instrument import Instrument
 
-class Logger():
-    def __init__(self, configuration, context):
-        self.configuration = configuration
-        self.context = context
-        self.socket = self.context.socket(zmq.PAIR)
-        self.socket.connect("inproc://manager-logger")
-        self.poller = zmq.Poller()
-        self.poller.register(self.socket, zmq.POLLIN)
+class Logger(Instrument):
+    def __init__(self, name, configuration, context):
+        super().__init__(name, configuration, context)
 
-        self.should_continue = True
+        self.prepare_and_run()
     
-    def __del__(self):
-        self.socket.close()
-
     def run(self):
         print("Program starts - Press CTRL+BREAK to force exit")
         while self.should_continue:
@@ -49,10 +41,3 @@ class Logger():
 
     def log_message(self, message):
         print(message["time"], message["header"], json.dumps(message["body"]))
-
-    def send_event(self, **kwargs):
-        event = dict()
-        event["header"] = "logger-event"
-        event["time"] = datetime.datetime.now().isoformat()
-        event["body"] = kwargs
-        self.socket.send_json(event)

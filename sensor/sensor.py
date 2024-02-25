@@ -7,26 +7,20 @@ import datetime
 import time
 import sys
 import csv
-import zmq
 import clr
 from .cpu import CPU
+from instrument import Instrument
 
 OUTPUT_DIR = "./output/"
 
-class Sensor():
-    def __init__(self, configuration, context):
-        self.configuration = configuration
+class Sensor(Instrument):
+    def __init__(self, name, configuration, context):
+        super().__init__(name, configuration, context)
         self.sampling_interval = self.configuration["sampling_interval"]
         self.start_time = time.time()
         self.file = open(OUTPUT_DIR + self.configuration["file_name"], "w", newline="")
         self.writer = csv.writer(self.file, delimiter=',')
         self.header_written = False
-
-        self.context = context
-        self.socket = self.context.socket(zmq.PAIR)
-        self.socket.connect("inproc://manager-sensor")
-        self.poller = zmq.Poller()
-        self.poller.register(self.socket, zmq.POLLIN)
 
         if "lhm_path" in self.configuration:
             sys.path.append(self.configuration["lhm_path"])
@@ -38,10 +32,7 @@ class Sensor():
         self.pc.Open()
         self.cpu = CPU(self.pc.Hardware[0])
 
-        self.should_continue = True
-
-    def __del__(self):
-        self.socket.close()
+        self.prepare_and_run()
 
     def run(self):
         while self.should_continue:
@@ -61,26 +52,12 @@ class Sensor():
         self.writer.writerow(list(values.values()))
         self.send_data(values)
     
-    def listen(self, timeout = None):
-        events = self.poller.poll(timeout)
-        if len(events) > 0:
-            for event in events:
-                if event[0] == self.socket and event[1] == zmq.POLLIN:
-                    message = event[0].recv_json()
-                    self.process_message(message)
-
     def send_data(self, data):
         event = dict()
+        event["sender"] = self.name
         event["header"] = "sensor-data"
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = data
-        self.socket.send_json(event)
-
-    def send_event(self, **kwargs):
-        event = dict()
-        event["header"] = "sensor-event"
-        event["time"] = datetime.datetime.now().isoformat()
-        event["body"] = kwargs
         self.socket.send_json(event)
 
     def process_message(self, message):

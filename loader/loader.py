@@ -7,27 +7,22 @@ Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 
 import os
 import multiprocessing
-import datetime
 import itertools
 import psutil
-import zmq
 from .actuator import Actuator
 from .controller import ControllerThread
 from .monitor import MonitorThread
+from instrument import Instrument
 
-class Loader():
-    def __init__(self, configuration, context):
-        self.configuration = configuration
-        self.context = context
-        self.socket = self.context.socket(zmq.PAIR)
-        self.socket.connect("inproc://manager-loader")
+class Loader(Instrument):
+    def __init__(self, name, configuration, context):
+        super().__init__(name, configuration, context)
 
         self.physical_cores = psutil.cpu_count(logical=False)
         self.logical_cores = psutil.cpu_count(logical=True)
         self.hyperthreading = self.logical_cores // self.physical_cores
 
-    def __del__(self):
-        self.socket.close()
+        self.prepare_and_run()
 
     def run(self):
         for load in self.configuration:
@@ -72,15 +67,7 @@ class Loader():
                     itertools.repeat(sampling_interval)
                 ))
             self.send_event(command = "stop", **load)
-        self.send_event(command = "finish")
-    
-    def send_event(self, **kwargs):
-        event = dict()
-        event["header"] = "loader-event"
-        event["time"] = datetime.datetime.now().isoformat()
-        event["body"] = kwargs
-        self.socket.send_json(event)
-            
+        self.send_event(command = "finish")            
 
 def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):
 

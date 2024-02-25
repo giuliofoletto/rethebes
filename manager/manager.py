@@ -22,75 +22,77 @@ class Manager():
         if "file_name" not in self.configuration["sensor"] or self.configuration["sensor"]["file_name"] == "auto":
             self.configuration["sensor"]["file_name"] = datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
 
-        self.s_loader = self.context.socket(zmq.PAIR)
-        self.s_loader.bind("inproc://manager-loader")
-        self.loader = Loader(self.configuration["loader"], self.context)
-        self.t_loader = Thread(target = self.loader.run)
-        self.t_loader.start()
-        self.r_loader = True
+        self.holders = dict()
+        self.holders["loader"] = Holder(Loader, "loader", self.configuration["loader"], self.context)
+        self.holders["sensor"] = Holder(Sensor, "sensor", self.configuration["sensor"], self.context)
+        self.holders["logger"] = Holder(Logger, "logger", self.configuration["logger"], self.context)
 
-        self.s_sensor = self.context.socket(zmq.PAIR)
-        self.s_sensor.bind("inproc://manager-sensor")
-        self.sensor = Sensor(self.configuration["sensor"], self.context)
-        self.t_sensor = Thread(target = self.sensor.run)
-        self.t_sensor.start()
-        self.r_sensor = True
+        for _, v in self.holders.items():
+            v.spawn()
 
-        self.s_logger = self.context.socket(zmq.PAIR)
-        self.s_logger.bind("inproc://manager-logger")
-        self.logger = Logger(self.configuration["logger"], self.context)
-        self.t_logger = Thread(target = self.logger.run)
-        self.t_logger.start()
-        self.r_logger = True
-
-        self.sockets = [self.s_loader, self.s_sensor, self.s_logger]
+        self.poller = zmq.Poller()
+        for s in [v.socket for _, v in self.holders.items()]:
+            self.poller.register(s, zmq.POLLIN)
 
         self.should_continue = True
         self.listen()
 
     def __del__(self):
-        del self.loader
-        del self.sensor
-        del self.logger
-        for socket in self.sockets:
-            socket.close()
+        # Call destructors of holders
+        self.holders.clear()
         self.context.term()
 
     def listen(self):
-        self.poller = zmq.Poller()
-        self.poller.register(self.s_loader, zmq.POLLIN)
-        self.poller.register(self.s_sensor, zmq.POLLIN)
-        self.poller.register(self.s_logger, zmq.POLLIN)
-
         while self.check_should_continue():
             events = self.poller.poll(self.polling_wait_time*1000)
             for event in events:
-                if event[0] in self.sockets:
+                if event[0] in [v.socket for _, v in self.holders.items()]:
                     message = event[0].recv_json()
-                    self.dispatch(message)
+                    self.process_message(message)
 
     def send_event(self, **kwargs):
         event = dict()
         event["header"] = "manager-event"
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = kwargs
-        for socket in self.sockets:
+        for socket in [v.socket for _, v in self.holders.items()]:
             socket.send_json(event)
     
-    def dispatch(self, message):
-        if message["header"] == "loader-event" and message["body"]["command"] == "finish":
-            self.send_event(command = "finish")
-            self.r_loader = False
-        elif message["header"] == "sensor-event" and message["body"]["command"] == "finish":
-            self.r_sensor = False
-        elif message["header"] == "logger-event" and message["body"]["command"] == "finish":
-            self.r_logger = False
+    def process_message(self, message):
+        if "-event" in message["header"] and message["body"]["command"] == "finish":
+            if message["sender"] == "loader":
+                self.send_event(command = "finish")
+            self.holders[message["sender"]].running = False
         if self.check_should_continue():
-            self.s_logger.send_json(message)
+            self.holders["logger"].socket.send_json(message)
 
     def check_should_continue(self):
         condition = False
-        for c in [self.r_loader, self.r_sensor, self.r_logger]:
+        for c in [v.running for _, v in self.holders.items()]:
             condition = condition or c
         self.should_continue = condition
         return self.should_continue
+
+class Holder():
+    def __init__(self, instrument_class, name, configuration, context):
+        self.instrument_class = instrument_class
+        self.name = name
+        self.configuration = configuration
+        self.context = context
+        self.socket = self.context.socket(zmq.PAIR)
+        self.socket.bind("inproc://manager-" + self.name)
+
+    def __del__(self):
+        self.running = False
+        self.thread.join()
+        self.socket.close()
+        # Call destructor of instrument
+        del self.instrument
+
+    def launch(self):
+        self.instrument = self.instrument_class(self.name, self.configuration, self.context)
+
+    def spawn(self):
+        self.thread = Thread(target=self.launch)
+        self.running = True
+        self.thread.start()
