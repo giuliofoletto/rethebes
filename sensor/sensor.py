@@ -11,16 +11,12 @@ import clr
 from .cpu import CPU
 from instrument import Instrument
 
-OUTPUT_DIR = "./output/"
-
 class Sensor(Instrument):
     def __init__(self, name, configuration, context):
         super().__init__(name, configuration, context)
         self.sampling_interval = self.configuration["sampling_interval"]
         self.start_time = time.time()
-        self.file = open(OUTPUT_DIR + self.configuration["file_name"], "w", newline="")
-        self.writer = csv.writer(self.file, delimiter=',')
-        self.header_written = False
+        
 
         if "lhm_path" in self.configuration:
             sys.path.append(self.configuration["lhm_path"])
@@ -35,6 +31,9 @@ class Sensor(Instrument):
         self.prepare_and_run()
 
     def run(self):
+        self.file = open(self.configuration["file_name"], "w", newline="")
+        self.writer = csv.writer(self.file, delimiter=',')
+        self.header_written = False
         while self.should_continue:
             self.listen(0) # Return immediately
             if not self.should_continue: # Allow stopping via message
@@ -42,6 +41,7 @@ class Sensor(Instrument):
             stop_period = time.time() + self.sampling_interval
             self.act()
             time.sleep(max(0, stop_period-time.time()))
+        self.file.close()
 
     def act(self):
         values = {"Time": datetime.datetime.now().isoformat()}

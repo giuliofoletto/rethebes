@@ -11,6 +11,8 @@ from loader import Loader
 from sensor import Sensor
 from logger import Logger
 
+OUTPUT_DIR = "./output/"
+
 class Manager():
     def __init__(self, configuration):
         self.context = zmq.Context(0)
@@ -20,7 +22,7 @@ class Manager():
         self.configuration = configuration
         # Allow auto setting of file name
         if "file_name" not in self.configuration["sensor"] or self.configuration["sensor"]["file_name"] == "auto":
-            self.configuration["sensor"]["file_name"] = datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
+            self.configuration["sensor"]["file_name"] = OUTPUT_DIR + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
 
         self.holders = dict()
         for instrument in self.configuration:
