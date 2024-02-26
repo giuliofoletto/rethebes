@@ -25,7 +25,9 @@ class Loader(Instrument):
         self.prepare_and_run()
 
     def run(self):
-        for load in self.configuration:
+        load_index = 0
+        while self.should_continue and load_index < len(self.configuration):
+            load = self.configuration[load_index]
             # Preprocess load at interface level
             # Allow loading all cores with "all"
             if load["target_cores"] == "all":
@@ -67,7 +69,13 @@ class Loader(Instrument):
                     itertools.repeat(sampling_interval)
                 ))
             self.send_event(command = "stop", **load)
-        self.send_event(command = "finish")            
+            load_index += 1
+            self.listen(0)
+        self.send_event(command = "finish")
+
+    def process_message(self, message):
+        if "-event" in message["header"] and message["body"]["command"] == "finish":
+            self.should_continue = False
 
 def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):
 
@@ -85,8 +93,10 @@ def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):
         monitor.start()
         control.start()
         actuator.run()
+    except KeyboardInterrupt:
+        print("Subprocess terminated due to CTRL+C event")
     except:
-        print("Exception in main loader")
+        print("Subprocess terminated due to exception")
     finally:
         actuator.close()
         monitor.stop()

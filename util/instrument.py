@@ -26,7 +26,11 @@ class Instrument():
         pass
 
     def listen(self, timeout = None):
-        events = self.poller.poll(timeout)
+        try:
+            events = self.poller.poll(timeout)
+        except KeyboardInterrupt:
+            self.should_continue = False
+            events = []
         if len(events) > 0:
             for event in events:
                 if event[0] == self.socket and event[1] == zmq.POLLIN:

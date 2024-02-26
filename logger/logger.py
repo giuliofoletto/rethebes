@@ -14,10 +14,10 @@ class Logger(Instrument):
         self.prepare_and_run()
     
     def run(self):
-        print("Program starts - Press CTRL+BREAK to force exit")
+        print("Program starts - Press CTRL+C to exit (more or less) gracefully or CTRL+BREAK to force exit")
         while self.should_continue:
             self.listen()
-        print("Program ends normally")
+        print("Program ends gracefully")
 
     def process_message(self, message):
         if message["header"] == "sensor-data":

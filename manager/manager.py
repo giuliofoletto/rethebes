@@ -42,7 +42,11 @@ class Manager():
 
     def listen(self):
         while self.check_should_continue():
-            events = self.poller.poll(self.polling_wait_time*1000)
+            try:
+                events = self.poller.poll(self.polling_wait_time*1000)
+            except KeyboardInterrupt:
+                self.send_event(command = "finish")
+                events = []
             for event in events:
                 if event[0] in [v.socket for _, v in self.holders.items()]:
                     message = event[0].recv_json()
@@ -50,6 +54,7 @@ class Manager():
 
     def send_event(self, **kwargs):
         event = dict()
+        event["sender"] = "manager"
         event["header"] = "manager-event"
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = kwargs
@@ -70,4 +75,3 @@ class Manager():
             condition = condition or c
         self.should_continue = condition
         return self.should_continue
-
