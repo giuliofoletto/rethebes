@@ -32,7 +32,13 @@ class Manager():
             self.poller.register(s, zmq.POLLIN)
 
         self.should_continue = True
+        self.should_execute_post_main_block = True
         self.listen()
+
+        if self.should_execute_post_main_block:
+            if self.configuration["manager"]["analyze"]:
+                from analyzer import Analyzer
+                Analyzer(self.configuration["sensor"]["file_name"])
 
     def __del__(self):
         # Call destructors of holders
@@ -45,6 +51,7 @@ class Manager():
                 events = self.poller.poll(self.polling_wait_time*1000)
             except KeyboardInterrupt:
                 self.send_event(command = "finish")
+                self.should_execute_post_main_block = False
                 events = []
             for event in events:
                 if event[0] in [v.socket for _, v in self.holders.items()]:
@@ -82,6 +89,10 @@ class Manager():
             for k in self.configuration:
                 if k != "manager":
                     self.configuration["manager"]["instruments"].append(k)
+        # Allow other default settings
+        for k, v in default_configuration["manager"].items():
+            if k not in self.configuration:
+                self.configuration[k] = v
         # Allow non-specification of logger
         if "logger" not in self.configuration["manager"]["instruments"]:
             self.configuration["manager"]["instruments"].append("logger")
