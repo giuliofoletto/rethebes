@@ -5,7 +5,6 @@ Authors: Giulio Foletto.
 """
 
 import json
-import zmq
 from instrument import Instrument
 
 class Logger(Instrument):
@@ -19,14 +18,6 @@ class Logger(Instrument):
         while self.should_continue:
             self.listen()
         print("Program ends normally")
-
-    def listen(self, timeout = None):
-        events = self.poller.poll(timeout)
-        if len(events) > 0:
-            for event in events:
-                if event[0] == self.socket and event[1] == zmq.POLLIN:
-                    message = event[0].recv_json()
-                    self.process_message(message)
 
     def process_message(self, message):
         if message["header"] == "sensor-data":
