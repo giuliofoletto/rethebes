@@ -1,5 +1,8 @@
-{
-    "loader":[
+default_configuration = {
+    "manager": {
+        "instruments": ["loader", "sensor", "logger"]
+    },
+    "loader": [
         {
             "target_cores": "all",
             "target_loads": 0,

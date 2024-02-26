@@ -1,4 +1,7 @@
 {
+    "manager": {
+        "instruments" : "auto"
+    },
     "loader":[
         {
             "target_cores": "all",
@@ -9,8 +12,5 @@
     ],
     "sensor": {
         "sampling_interval": 0.1
-    },
-    "logger": {
-        "file_name": "auto"
     }
 }

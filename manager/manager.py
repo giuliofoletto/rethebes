@@ -7,6 +7,7 @@ Authors: Giulio Foletto.
 import datetime
 import zmq
 from util import Holder
+from .default_configuration import default_configuration
 
 OUTPUT_DIR = "./output/"
 
@@ -17,12 +18,10 @@ class Manager():
 
         # Preprocess configuration
         self.configuration = configuration
-        # Allow auto setting of file name
-        if "file_name" not in self.configuration["sensor"] or self.configuration["sensor"]["file_name"] == "auto":
-            self.configuration["sensor"]["file_name"] = OUTPUT_DIR + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
-
+        self.pre_process_configuration()
+        
         self.holders = dict()
-        for instrument in self.configuration:
+        for instrument in self.configuration["manager"]["instruments"]:
             self.holders[instrument] = Holder(instrument, self.configuration[instrument], self.context)
 
         for _, v in self.holders.items():
@@ -75,3 +74,18 @@ class Manager():
             condition = condition or c
         self.should_continue = condition
         return self.should_continue
+
+    def pre_process_configuration(self):
+        # Allow automatic list of instruments
+        if "instruments" not in self.configuration["manager"] or self.configuration["manager"]["instruments"] == "auto":
+            self.configuration["manager"]["instruments"] = []
+            for k in self.configuration:
+                if k != "manager":
+                    self.configuration["manager"]["instruments"].append(k)
+        # Allow non-specification of logger
+        if "logger" not in self.configuration["manager"]["instruments"]:
+            self.configuration["manager"]["instruments"].append("logger")
+            self.configuration["logger"] = default_configuration["logger"]
+        # Allow auto setting of file name
+        if "sensor" in self.configuration and ("file_name" not in self.configuration["sensor"] or self.configuration["sensor"]["file_name"] == "auto"):
+            self.configuration["sensor"]["file_name"] = OUTPUT_DIR + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"

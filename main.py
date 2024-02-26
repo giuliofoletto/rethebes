@@ -8,14 +8,17 @@ Authors: Giulio Foletto.
 if __name__ == '__main__':
     import argparse
     import json
-    from manager import Manager
+    from manager import Manager, default_configuration
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--configuration", type = str, default = "./config/default.json", help = "Configuration file")
+    parser.add_argument("-c", "--configuration", type = str, default = "", help = "Configuration file")
     args = parser.parse_args()
 
-    with open(args.configuration) as f:
-        configuration = json.load(f)
+    try:
+        with open(args.configuration) as f:
+            configuration = json.load(f)
+    except:
+        configuration = default_configuration
 
     m = Manager(configuration)
 
