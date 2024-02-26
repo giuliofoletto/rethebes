@@ -1,8 +1,5 @@
 from threading import Thread
 import zmq
-from loader import Loader
-from sensor import Sensor
-from logger import Logger
 
 class Holder():
     def __init__(self, name, configuration, context):
@@ -29,11 +26,15 @@ class Holder():
         self.thread.start()
 
     def factory(self, name):
+        # Ugly import logic to avoid circular imports when importing Instrument which is part of util like Holder
         if name == "loader":
+            from loader import Loader
             return Loader
         elif name == "sensor":
+            from sensor import Sensor
             return Sensor
         elif name == "logger":
+            from logger import Logger
             return Logger
         else:
             raise ValueError("Unknown instrument")

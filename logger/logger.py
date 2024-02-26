@@ -5,7 +5,7 @@ Authors: Giulio Foletto.
 """
 
 import json
-from instrument import Instrument
+from util import Instrument
 
 class Logger(Instrument):
     def __init__(self, name, configuration, context):

@@ -6,7 +6,7 @@ Authors: Giulio Foletto.
 
 import datetime
 import zmq
-from holder import Holder
+from util import Holder
 
 OUTPUT_DIR = "./output/"
 

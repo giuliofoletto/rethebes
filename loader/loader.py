@@ -12,7 +12,7 @@ import psutil
 from .actuator import Actuator
 from .controller import ControllerThread
 from .monitor import MonitorThread
-from instrument import Instrument
+from util import Instrument
 
 class Loader(Instrument):
     def __init__(self, name, configuration, context):

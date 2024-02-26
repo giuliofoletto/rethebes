@@ -9,7 +9,7 @@ import sys
 import csv
 import clr
 from .cpu import CPU
-from instrument import Instrument
+from util import Instrument
 
 class Sensor(Instrument):
     def __init__(self, name, configuration, context):
