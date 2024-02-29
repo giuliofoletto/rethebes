@@ -6,18 +6,23 @@ Authors: Giulio Foletto.
 
 import datetime
 import zmq
-from util import Holder
+from util import Instrument, Holder
 from .default_configuration import default_configuration
 
 OUTPUT_DIR = "./output/"
 
-class Manager():
+class Manager(Instrument):
     def __init__(self, configuration):
-        self.context = zmq.Context(0)
-        self.polling_wait_time = 0.1 # seconds
+        name = "manager"
+        context = zmq.Context(0)
+        super().__init__(name, configuration, context)
 
+    def init_sockets(self):
+        # This does not actually initialize sockets, only warn that they are not ready yet
+        self.sockets_ready = False
+
+    def open(self):
         # Preprocess configuration
-        self.configuration = configuration
         self.pre_process_configuration()
         
         self.holders = dict()
@@ -30,34 +35,41 @@ class Manager():
         self.poller = zmq.Poller()
         for s in [v.socket for _, v in self.holders.items()]:
             self.poller.register(s, zmq.POLLIN)
+        self.sockets_ready = True
 
-        self.should_continue = True
         self.should_execute_post_main_block = True
         self.send_event(command = "start")
-        self.listen()
 
+    def close(self):
         if self.should_execute_post_main_block:
             if self.configuration["manager"]["analyze"]:
                 from analyzer import Analyzer
                 Analyzer(self.configuration["sensor"]["file_name"])
 
     def __del__(self):
+        for s in [v.socket for _, v in self.holders.items()]:
+            s.close()
         # Call destructors of holders
         self.holders.clear()
         self.context.term()
 
-    def listen(self):
-        while self.check_should_continue():
-            try:
-                events = self.poller.poll(self.polling_wait_time*1000)
-            except KeyboardInterrupt:
-                self.send_event(command = "finish")
-                self.should_execute_post_main_block = False
-                events = []
-            for event in events:
-                if event[0] in [v.socket for _, v in self.holders.items()]:
-                    message = event[0].recv_json()
-                    self.process_message(message)
+    def wait(self):
+        if self.check_should_continue():
+            self.listen(100)
+        else:
+            self.set_state("closing")
+
+    def listen(self, timeout = None):
+        try:
+            events = self.poller.poll(timeout)
+        except KeyboardInterrupt:
+            self.send_event(command = "finish")
+            self.should_execute_post_main_block = False
+            events = []
+        for event in events:
+            if event[0] in [v.socket for _, v in self.holders.items()]:
+                message = event[0].recv_json()
+                self.process_message(message)
 
     def send_event(self, **kwargs):
         event = dict()
@@ -80,8 +92,7 @@ class Manager():
         condition = False
         for c in [v.running for _, v in self.holders.items()]:
             condition = condition or c
-        self.should_continue = condition
-        return self.should_continue
+        return condition
 
     def pre_process_configuration(self):
         # Allow automatic list of instruments
