@@ -33,6 +33,7 @@ class Manager():
 
         self.should_continue = True
         self.should_execute_post_main_block = True
+        self.send_event(command = "start")
         self.listen()
 
         if self.should_execute_post_main_block:

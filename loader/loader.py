@@ -18,16 +18,17 @@ class Loader(Instrument):
     def __init__(self, name, configuration, context):
         super().__init__(name, configuration, context)
 
+    def open(self):
         self.physical_cores = psutil.cpu_count(logical=False)
         self.logical_cores = psutil.cpu_count(logical=True)
         self.hyperthreading = self.logical_cores // self.physical_cores
 
-        self.prepare_and_run()
-
     def run(self):
-        load_index = 0
-        while self.should_continue and load_index < len(self.configuration):
-            load = self.configuration[load_index]
+        for load in self.configuration:
+            # This is a long running operation, so we need to check state often
+            self.listen(0)
+            if self.get_state() != "running":
+                break
             # Preprocess load at interface level
             # Allow loading all cores with "all"
             if load["target_cores"] == "all":
@@ -69,13 +70,8 @@ class Loader(Instrument):
                     itertools.repeat(sampling_interval)
                 ))
             self.send_event(command = "stop", **load)
-            load_index += 1
-            self.listen(0)
         self.send_event(command = "finish")
 
-    def process_message(self, message):
-        if "-event" in message["header"] and message["body"]["command"] == "finish":
-            self.should_continue = False
 
 def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):
 

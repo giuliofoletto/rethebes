@@ -14,9 +14,10 @@ from util import Instrument
 class Sensor(Instrument):
     def __init__(self, name, configuration, context):
         super().__init__(name, configuration, context)
+
+    def open(self):
         self.sampling_interval = self.configuration["sampling_interval"]
-        self.start_time = time.time()
-        
+        self.start_time = time.time()        
 
         if "lhm_path" in self.configuration:
             sys.path.append(self.configuration["lhm_path"])
@@ -28,20 +29,17 @@ class Sensor(Instrument):
         self.pc.Open()
         self.cpu = CPU(self.pc.Hardware[0])
 
-        self.prepare_and_run()
-
-    def run(self):
         self.file = open(self.configuration["file_name"], "w", newline="")
         self.writer = csv.writer(self.file, delimiter=',')
         self.header_written = False
-        while self.should_continue:
-            self.listen(0) # Return immediately
-            if not self.should_continue: # Allow stopping via message
-                break
-            stop_period = time.time() + self.sampling_interval
-            self.act()
-            time.sleep(max(0, stop_period-time.time()))
+
+    def close(self):
         self.file.close()
+
+    def run(self):
+        stop_period = time.time() + self.sampling_interval
+        self.act()
+        time.sleep(max(0, stop_period-time.time()))
 
     def act(self):
         values = {"Time": datetime.datetime.now().isoformat()}
@@ -59,8 +57,3 @@ class Sensor(Instrument):
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = data
         self.socket.send_json(event)
-
-    def process_message(self, message):
-        if "command" in message["body"] and message["body"]["command"] == "finish":
-            self.should_continue = False
-            self.send_event(command = "finish")
