@@ -28,7 +28,8 @@ class Instrument():
     
     def main(self):
         while True:
-            self.listen(0)
+            if self.sockets_ready: # For some instruments, it might make sense to init sockets in open
+                self.listen(0)
             state = self.get_state()
             if state == "opening":
                 self.open()
@@ -48,9 +49,11 @@ class Instrument():
         self.socket.connect("inproc://manager-" + self.name)
         self.poller = zmq.Poller()
         self.poller.register(self.socket, zmq.POLLIN)
+        self.sockets_ready = True
 
     def terminate_sockets(self):
         self.socket.close()
+        self.sockets_ready = False
 
     def open(self):
         pass
