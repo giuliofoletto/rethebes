@@ -32,8 +32,9 @@ class Manager(Instrument):
         for _, v in self.holders.items():
             v.spawn()
 
+        self.sockets = [v.socket for _, v in self.holders.items()]
         self.poller = zmq.Poller()
-        for s in [v.socket for _, v in self.holders.items()]:
+        for s in self.sockets:
             self.poller.register(s, zmq.POLLIN)
         self.sockets_ready = True
 
@@ -47,9 +48,10 @@ class Manager(Instrument):
                 Analyzer(self.configuration["sensor"]["file_name"])
 
     def __del__(self):
-        for s in [v.socket for _, v in self.holders.items()]:
+        for s in self.sockets:
             s.close()
         # Call destructors of holders
+        self.sockets.clear()
         self.holders.clear()
         self.context.term()
 
@@ -67,18 +69,9 @@ class Manager(Instrument):
             self.should_execute_post_main_block = False
             events = []
         for event in events:
-            if event[0] in [v.socket for _, v in self.holders.items()]:
+            if event[0] in self.sockets:
                 message = event[0].recv_json()
                 self.process_message(message)
-
-    def send_event(self, **kwargs):
-        event = dict()
-        event["sender"] = "manager"
-        event["header"] = "manager-event"
-        event["time"] = datetime.datetime.now().isoformat()
-        event["body"] = kwargs
-        for socket in [v.socket for _, v in self.holders.items()]:
-            socket.send_json(event)
     
     def process_message(self, message):
         if "-event" in message["header"] and message["body"]["command"] == "finish":

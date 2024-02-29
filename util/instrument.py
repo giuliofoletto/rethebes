@@ -45,14 +45,17 @@ class Instrument():
                 raise ValueError("Unknown state: " + state)
 
     def init_sockets(self):
-        self.socket = self.context.socket(zmq.PAIR)
-        self.socket.connect("inproc://manager-" + self.name)
+        socket = self.context.socket(zmq.PAIR)
+        socket.connect("inproc://manager-" + self.name)
+        self.sockets = [socket]
         self.poller = zmq.Poller()
-        self.poller.register(self.socket, zmq.POLLIN)
+        for s in self.sockets:
+            self.poller.register(s, zmq.POLLIN)
         self.sockets_ready = True
 
     def terminate_sockets(self):
-        self.socket.close()
+        for s in self.sockets:
+            s.close()
         self.sockets_ready = False
 
     def open(self):
@@ -75,7 +78,7 @@ class Instrument():
             events = []
         if len(events) > 0:
             for event in events:
-                if event[0] == self.socket and event[1] == zmq.POLLIN:
+                if event[0] in self.sockets and event[1] == zmq.POLLIN:
                     message = event[0].recv_json()
                     self.process_message(message)
 
@@ -94,5 +97,6 @@ class Instrument():
         event["header"] = self.name + "-event"
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = kwargs
-        self.socket.send_json(event)
+        for s in self.sockets:
+            s.send_json(event)
     
