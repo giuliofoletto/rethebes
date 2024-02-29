@@ -17,6 +17,14 @@ class Manager(Instrument):
         context = zmq.Context(0)
         super().__init__(name, configuration, context)
 
+    def __del__(self):
+        for s in self.sockets:
+            s.close()
+        # Call destructors of holders
+        self.sockets.clear()
+        self.holders.clear()
+        self.context.term()
+
     def init_sockets(self):
         # This does not actually initialize sockets, only warn that they are not ready yet
         self.sockets_ready = False
@@ -47,13 +55,9 @@ class Manager(Instrument):
                 from analyzer import Analyzer
                 Analyzer(self.configuration["sensor"]["file_name"])
 
-    def __del__(self):
-        for s in self.sockets:
-            s.close()
-        # Call destructors of holders
-        self.sockets.clear()
-        self.holders.clear()
-        self.context.term()
+    def run(self):
+        # Should never run
+        self.set_state("waiting")
 
     def wait(self):
         if self.check_should_continue():
