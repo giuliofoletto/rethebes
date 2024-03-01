@@ -1,7 +1,6 @@
 {
     "manager": {
-        "instruments" : "auto",
-        "analyze": true
+        "instruments" : "auto"
     },
     "loader":[
         {

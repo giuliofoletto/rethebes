@@ -1,7 +1,6 @@
 default_configuration = {
     "manager": {
-        "instruments": ["loader", "sensor"],
-        "analyze": False,
+        "instruments": ["loader", "sensor"]
     },
     "loader": [
         {

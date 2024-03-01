@@ -48,15 +48,10 @@ class Manager(Instrument):
             self.poller.register(s, zmq.POLLIN)
         self.sockets_ready = True
 
-        self.should_execute_post_main_block = True
         self.send_event(command = "start")
         logging.info("Program starts - Press CTRL+C to exit (more or less) gracefully or CTRL+BREAK to force exit")
 
     def close(self):
-        if self.should_execute_post_main_block:
-            if self.configuration["manager"]["analyze"]:
-                from analyzer import Analyzer
-                Analyzer(self.configuration["sensor"]["file_name"])
         logging.info("Program ends gracefully")
 
     def run(self):
@@ -74,7 +69,6 @@ class Manager(Instrument):
             events = self.poller.poll(timeout)
         except KeyboardInterrupt:
             self.send_event(command = "finish")
-            self.should_execute_post_main_block = False
             events = []
         for event in events:
             if event[0] in self.sockets:
