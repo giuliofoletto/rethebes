@@ -61,7 +61,7 @@ class Manager(Instrument):
 
     def wait(self):
         if self.check_should_continue():
-            self.listen(100)
+            self.listen() # Exit only with a message
         else:
             self.set_state("closing")
 
