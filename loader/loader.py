@@ -14,7 +14,7 @@ import psutil
 from .actuator import Actuator
 from .controller import ControllerThread
 from .monitor import MonitorThread
-from util import Instrument
+from util import Instrument, configure_logging
 
 class Loader(Instrument):
     def __init__(self, name, configuration, context):
@@ -77,10 +77,7 @@ class Loader(Instrument):
 
 def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):
     # Reconfigure this as logging lives per process
-    logging.basicConfig(stream = sys.stdout,
-                        level = logging.INFO,
-                        format = "[%(asctime)s] %(levelname)s - %(message)s",
-                        datefmt="%Y-%m-%dT%H:%M:%S")
+    configure_logging()
 
     # lock this process to the target core
     process = psutil.Process(os.getpid())
