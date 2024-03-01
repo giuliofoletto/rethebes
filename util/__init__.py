@@ -1,4 +1,3 @@
 from .instrument import Instrument
-from .holder import Holder
-from .director import Director, Dummy
+from .director import Director
 from .util import *

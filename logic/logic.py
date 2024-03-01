@@ -1,4 +1,4 @@
-from util import Dummy
+from manager import Manager
 from loader import Loader
 from sensor import Sensor
 import zmq
@@ -21,10 +21,10 @@ def process_configuration(configuration):
 def main(configuration):
     configuration = process_configuration(configuration)
     context = zmq.Context(0)
-    s = Sensor("sensor", context, configuration["sensor"])
-    l = Loader("loader", context, configuration["loader"])
-    d = Dummy("director", context, [s, l])
+    sensor = Sensor("sensor", context, configuration["sensor"])
+    loader = Loader("loader", context, configuration["loader"])
+    manager = Manager("director", context, [sensor, loader])
 
-    d.main()
+    manager.main()
     
     context.term()

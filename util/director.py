@@ -1,12 +1,11 @@
 """
-???
+Generic director class that controls multiple instruments.
 
 Authors: Giulio Foletto.
 """
 
 import logging
 from threading import Thread
-import json
 import zmq
 from util import Instrument
 
@@ -76,12 +75,3 @@ class Director(Instrument):
             self.sockets[name].close()
             self.poller.unregister(self.sockets[name])
             self.sockets.pop(name)
-
-class Dummy(Director):
-    def process_message(self, message):
-        if "-event" in message["header"]:
-            logging.info(message["header"] + " " + json.dumps(message["body"]))
-        if "-event" in message["header"] and message["body"]["command"] == "finish":
-            if message["sender"] == "loader":
-                self.send_event(command = "close")
-                self.wait_for_closure()
