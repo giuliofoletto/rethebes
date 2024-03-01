@@ -6,6 +6,7 @@ Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 """
 
 import os
+import sys
 import multiprocessing
 import itertools
 import logging
@@ -75,6 +76,11 @@ class Loader(Instrument):
 
 
 def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):
+    # Reconfigure this as logging lives per process
+    logging.basicConfig(stream = sys.stdout,
+                        level = logging.INFO,
+                        format = "[%(asctime)s] %(levelname)s - %(message)s",
+                        datefmt="%Y-%m-%dT%H:%M:%S")
 
     # lock this process to the target core
     process = psutil.Process(os.getpid())
