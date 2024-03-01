@@ -4,6 +4,8 @@ Core logic singlet.
 Authors: Giulio Foletto.
 """
 
+import logging
+import json
 import datetime
 import zmq
 from util import Instrument, Holder
@@ -48,12 +50,14 @@ class Manager(Instrument):
 
         self.should_execute_post_main_block = True
         self.send_event(command = "start")
+        logging.info("Program starts - Press CTRL+C to exit (more or less) gracefully or CTRL+BREAK to force exit")
 
     def close(self):
         if self.should_execute_post_main_block:
             if self.configuration["manager"]["analyze"]:
                 from analyzer import Analyzer
                 Analyzer(self.configuration["sensor"]["file_name"])
+        logging.info("Program ends gracefully")
 
     def run(self):
         # Should never run
@@ -82,8 +86,8 @@ class Manager(Instrument):
             if message["sender"] == "loader":
                 self.send_event(command = "finish")
             self.holders[message["sender"]].running = False
-        if self.check_should_continue():
-            self.holders["logger"].socket.send_json(message)
+        if "-event" in message["header"]:
+            logging.info(message["header"] + " " + json.dumps(message["body"]))
 
     def check_should_continue(self):
         condition = False
@@ -102,10 +106,6 @@ class Manager(Instrument):
         for k, v in default_configuration["manager"].items():
             if k not in self.configuration:
                 self.configuration[k] = v
-        # Allow non-specification of logger
-        if "logger" not in self.configuration["manager"]["instruments"]:
-            self.configuration["manager"]["instruments"].append("logger")
-            self.configuration["logger"] = default_configuration["logger"]
         # Allow auto setting of file name
         if "sensor" in self.configuration and ("file_name" not in self.configuration["sensor"] or self.configuration["sensor"]["file_name"] == "auto"):
             self.configuration["sensor"]["file_name"] = OUTPUT_DIR + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"

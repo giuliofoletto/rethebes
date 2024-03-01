@@ -8,6 +8,7 @@ Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 import os
 import multiprocessing
 import itertools
+import logging
 import psutil
 from .actuator import Actuator
 from .controller import ControllerThread
@@ -90,9 +91,9 @@ def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):
         control.start()
         actuator.run()
     except KeyboardInterrupt:
-        print("Subprocess terminated due to CTRL+C event")
+        logging.warning("Subprocess terminated due to CTRL+C event")
     except:
-        print("Subprocess terminated due to exception")
+        logging.warning("Subprocess terminated due to exception")
     finally:
         actuator.close()
         monitor.stop()

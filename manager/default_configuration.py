@@ -1,6 +1,6 @@
 default_configuration = {
     "manager": {
-        "instruments": ["loader", "sensor", "logger"],
+        "instruments": ["loader", "sensor"],
         "analyze": False,
     },
     "loader": [
@@ -25,8 +25,5 @@ default_configuration = {
     ],
     "sensor": {
         "sampling_interval": 0.1
-    },
-    "logger": {
-        "file_name": "auto"
     }
 }
