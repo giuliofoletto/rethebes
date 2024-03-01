@@ -25,6 +25,6 @@ def main(configuration):
     l = Loader("loader", context, configuration["loader"])
     d = Dummy("director", context, [s, l])
 
-    d.launch()
+    d.main()
     
     context.term()

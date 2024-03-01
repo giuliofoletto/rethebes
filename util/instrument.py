@@ -11,10 +11,8 @@ class Instrument():
         self.sockets_ready = False
         self.init_sockets()
         self.set_state("opening")
-        self.thread = Thread(target=self.main)
 
-    def join(self):
-        self.thread.join()
+    def release(self):
         self.terminate_sockets()
 
     def set_state(self, state):
@@ -27,10 +25,6 @@ class Instrument():
         state = self.state
         self.state_lock.release()
         return state
-    
-    def launch(self):
-        self.thread.start()
-        return self.thread
     
     def main(self):
         while True:
@@ -46,10 +40,10 @@ class Instrument():
                 self.run()
             elif state == "closing":
                 self.close()
-                self.send_event(command = "closing")
                 break
             else:
                 raise ValueError("Unknown state: " + state)
+        self.release()
 
     def init_sockets(self):
         socket = self.context.socket(zmq.PAIR)
@@ -92,9 +86,8 @@ class Instrument():
                     self.process_message(message)
 
     def process_message(self, message):
-        if "command" in message["body"] and message["body"]["command"] == "finish":
+        if "command" in message["body"] and message["body"]["command"] == "close":
             self.set_state("closing")
-            self.send_event(command = "finish")
         elif "command" in message["body"] and message["body"]["command"] == "start":
             self.set_state("running")
         elif "command" in message["body"] and message["body"]["command"] == "stop":

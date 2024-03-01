@@ -5,6 +5,7 @@ Authors: Giulio Foletto.
 """
 
 import logging
+from threading import Thread
 import json
 import zmq
 from util import Instrument
@@ -15,7 +16,7 @@ class Director(Instrument):
         self.threads = dict()
         super().__init__(name, context)
 
-    def join(self):
+    def release(self):
         self.terminate_sockets()
         self.threads.clear()
         self.subordinates.clear()
@@ -30,20 +31,15 @@ class Director(Instrument):
             self.poller.register(socket, zmq.POLLIN)
         self.sockets_ready = True
 
-    def launch(self):
-        self.main()
-        self.join()
-
     def open(self):
         for subordinate in self.subordinates:
-            thread = subordinate.launch()
+            thread = Thread(target = subordinate.main)
             self.threads[subordinate.name] = thread
+            thread.start()
         self.send_event(command = "start")
         logging.info("Program starts - Press CTRL+C to exit (more or less) gracefully or CTRL+BREAK to force exit")
 
     def close(self):
-        for subordinate in self.subordinates:
-            subordinate.join()
         logging.info("Program ends gracefully")
 
     def run(self):
@@ -60,7 +56,8 @@ class Director(Instrument):
         try:
             events = self.poller.poll(timeout)
         except KeyboardInterrupt:
-            self.send_event(command = "finish")
+            self.send_event(command = "close")
+            self.wait_for_closure()
             events = []
         if len(events) > 0:
             for event in events:
@@ -68,22 +65,23 @@ class Director(Instrument):
                     message = event[0].recv_json()
                     self.process_message(message)
 
-    def process_message(self, message):
-        if "command" in message["body"] and message["body"]["command"] == "closing":
-            self.threads[message["sender"]].join()
-            self.threads.pop(message["sender"])
-            self.sockets[message["sender"]].close()
-            self.poller.unregister(self.sockets[message["sender"]])
-            self.sockets.pop(message["sender"])
-
     def check_should_continue(self):
         return bool(self.threads)
+    
+    def wait_for_closure(self):
+        names = list(self.threads.keys())
+        for name in names:
+            self.threads[name].join()
+            self.threads.pop(name)
+            self.sockets[name].close()
+            self.poller.unregister(self.sockets[name])
+            self.sockets.pop(name)
 
 class Dummy(Director):
     def process_message(self, message):
-        super().process_message(message)
-        if "-event" in message["header"] and message["body"]["command"] == "finish":
-            if message["sender"] == "loader":
-                self.send_event(command = "finish")
         if "-event" in message["header"]:
             logging.info(message["header"] + " " + json.dumps(message["body"]))
+        if "-event" in message["header"] and message["body"]["command"] == "finish":
+            if message["sender"] == "loader":
+                self.send_event(command = "close")
+                self.wait_for_closure()
