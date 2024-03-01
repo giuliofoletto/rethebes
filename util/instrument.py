@@ -1,17 +1,20 @@
+import logging
 import datetime
 import zmq
-from threading import Lock
+from threading import Thread, Lock
 
 class Instrument():
     def __init__(self, name, context):
         self.name = name
         self.context = context
         self.state_lock = Lock()
+        self.sockets_ready = False
         self.init_sockets()
         self.set_state("opening")
-        self.main()
+        self.thread = Thread(target=self.main)
 
-    def __del__(self):
+    def join(self):
+        self.thread.join()
         self.terminate_sockets()
 
     def set_state(self, state):
@@ -24,6 +27,10 @@ class Instrument():
         state = self.state
         self.state_lock.release()
         return state
+    
+    def launch(self):
+        self.thread.start()
+        return self.thread
     
     def main(self):
         while True:
@@ -39,22 +46,25 @@ class Instrument():
                 self.run()
             elif state == "closing":
                 self.close()
+                self.send_event(command = "closing")
                 break
             else:
                 raise ValueError("Unknown state: " + state)
 
     def init_sockets(self):
         socket = self.context.socket(zmq.PAIR)
-        socket.connect("inproc://manager-" + self.name)
-        self.sockets = [socket]
+        socket.connect("inproc://" + self.name)
+        self.sockets = {"main": socket}
         self.poller = zmq.Poller()
-        for s in self.sockets:
+        for s in self.sockets.values():
             self.poller.register(s, zmq.POLLIN)
         self.sockets_ready = True
 
     def terminate_sockets(self):
-        for s in self.sockets:
+        for s in self.sockets.values():
             s.close()
+            self.poller.unregister(s)
+        self.sockets.clear()
         self.sockets_ready = False
 
     def open(self):
@@ -77,7 +87,7 @@ class Instrument():
             events = []
         if len(events) > 0:
             for event in events:
-                if event[0] in self.sockets and event[1] == zmq.POLLIN:
+                if event[0] in self.sockets.values() and event[1] == zmq.POLLIN:
                     message = event[0].recv_json()
                     self.process_message(message)
 
@@ -96,6 +106,6 @@ class Instrument():
         event["header"] = self.name + "-event"
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = kwargs
-        for s in self.sockets:
+        for s in self.sockets.values():
             s.send_json(event)
     

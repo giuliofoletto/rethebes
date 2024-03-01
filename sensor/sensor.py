@@ -57,5 +57,5 @@ class Sensor(Instrument):
         event["header"] = "sensor-data"
         event["time"] = datetime.datetime.now().isoformat()
         event["body"] = data
-        for s in self.sockets:
+        for s in self.sockets.values():
             s.send_json(event)
