@@ -2,7 +2,7 @@ from threading import Thread
 import zmq
 
 class Holder():
-    def __init__(self, name, configuration, context):
+    def __init__(self, name, context, configuration):
         self.instrument_class = self.factory(name)
         self.name = name
         self.configuration = configuration
@@ -18,7 +18,7 @@ class Holder():
         del self.instrument
 
     def launch(self):
-        self.instrument = self.instrument_class(self.name, self.configuration, self.context)
+        self.instrument = self.instrument_class(self.name, self.context, self.configuration)
 
     def spawn(self):
         self.thread = Thread(target=self.launch)

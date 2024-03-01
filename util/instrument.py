@@ -3,9 +3,8 @@ import zmq
 from threading import Lock
 
 class Instrument():
-    def __init__(self, name, configuration, context):
+    def __init__(self, name, context):
         self.name = name
-        self.configuration = configuration
         self.context = context
         self.state_lock = Lock()
         self.init_sockets()

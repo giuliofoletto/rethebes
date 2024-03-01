@@ -17,8 +17,9 @@ from .monitor import MonitorThread
 from util import Instrument, configure_logging
 
 class Loader(Instrument):
-    def __init__(self, name, configuration, context):
-        super().__init__(name, configuration, context)
+    def __init__(self, name, context, configuration):
+        self.configuration = configuration
+        super().__init__(name, context)
 
     def open(self):
         self.physical_cores = psutil.cpu_count(logical=False)

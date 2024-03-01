@@ -17,7 +17,8 @@ class Manager(Instrument):
     def __init__(self, configuration):
         name = "manager"
         context = zmq.Context(0)
-        super().__init__(name, configuration, context)
+        self.configuration = configuration
+        super().__init__(name, context)
 
     def __del__(self):
         for s in self.sockets:
@@ -37,7 +38,7 @@ class Manager(Instrument):
         
         self.holders = dict()
         for instrument in self.configuration["manager"]["instruments"]:
-            self.holders[instrument] = Holder(instrument, self.configuration[instrument], self.context)
+            self.holders[instrument] = Holder(instrument, self.context, self.configuration[instrument])
 
         for _, v in self.holders.items():
             v.spawn()

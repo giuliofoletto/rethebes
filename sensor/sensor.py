@@ -12,8 +12,9 @@ from .cpu import CPU
 from util import Instrument
 
 class Sensor(Instrument):
-    def __init__(self, name, configuration, context):
-        super().__init__(name, configuration, context)
+    def __init__(self, name, context, configuration):
+        self.configuration = configuration
+        super().__init__(name, context)
 
     def open(self):
         self.sampling_interval = self.configuration["sampling_interval"]
