@@ -1,2 +1,1 @@
-from .logic import main, get_default_config_directory, process_configuration
-from .default_configuration import default_configuration
+from .logic import main, default_configuration, get_default_config_directory, process_configuration

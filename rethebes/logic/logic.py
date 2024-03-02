@@ -11,12 +11,29 @@ from rethebes.manager import Manager
 from rethebes.loader import Loader
 from rethebes.sensor import Sensor
 from rethebes.timer import Timer
-from .default_configuration import default_configuration
 
 known_instruments = {
     "loader": Loader,
     "sensor": Sensor,
     "timer": Timer
+}
+
+default_configuration = {
+    "instruments": ["loader", "sensor"],
+    "loader": [
+        {
+            "target_cores": "all",
+            "target_loads": 0,
+            "duration": 5,
+            "sampling_interval": 0.1
+        }
+    ],
+    "sensor": {
+        "sampling_interval": 0.1
+    },
+    "timer": {
+        "duration": 5
+    }
 }
 
 def process_configuration(configuration):
