@@ -1,4 +1,3 @@
 **/__pycache__/*
-sensor/lib/*.sys
-output/*
-config/*
+**/output/*
+**/config/*
