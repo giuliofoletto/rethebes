@@ -9,7 +9,7 @@ import sys
 import csv
 import clr
 from .cpu import CPU
-from util import Instrument
+from rethebes.util import Instrument
 
 class Sensor(Instrument):
     def __init__(self, name, context, configuration):

@@ -5,13 +5,12 @@ Authors: Giulio Foletto.
 """
 
 import datetime
+import os
 import zmq
-from manager import Manager
-from loader import Loader
-from sensor import Sensor
+from rethebes.manager import Manager
+from rethebes.loader import Loader
+from rethebes.sensor import Sensor
 from .default_configuration import default_configuration
-
-OUTPUT_DIR = "./output/"
 
 def process_configuration(configuration):
     # Allow automatic list of instruments
@@ -27,8 +26,15 @@ def process_configuration(configuration):
             configuration[k] = default_configuration[k]
     # Allow auto setting of file name
     if "sensor" in configuration and ("file_name" not in configuration["sensor"] or configuration["sensor"]["file_name"] == "auto"):
-        configuration["sensor"]["file_name"] = OUTPUT_DIR + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
+        configuration["sensor"]["file_name"] = str(get_default_global_directory()) + "/" + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
     return configuration
+
+def get_default_global_directory():
+    user_dir = os.path.expanduser("~")
+    rethebes_dir = os.path.join(user_dir, "rethebes")
+    if not os.path.exists(rethebes_dir):
+        os.makedirs(rethebes_dir)
+    return rethebes_dir
 
 def main(configuration):
     configuration = process_configuration(configuration)

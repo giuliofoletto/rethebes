@@ -5,12 +5,12 @@ Authors: Giulio Foletto.
 """
 
 # Encapsulation in condition is necessary because otherwise subprocess might re-execute this module.
-if __name__ == '__main__':
+def cli():
     import argparse
     import json
-    from analyzer import Analyzer
-    from util import configure_logging
-    from logic import main, default_configuration
+    from rethebes.analyzer import Analyzer
+    from rethebes.util import configure_logging
+    from rethebes.logic import main, default_configuration
     
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", type = str, help = "Mode of operation [run|analyze]")
@@ -30,3 +30,5 @@ if __name__ == '__main__':
     elif args.mode == "analyze":
         a = Analyzer(args.file)
 
+if __name__ == '__main__':
+    cli()

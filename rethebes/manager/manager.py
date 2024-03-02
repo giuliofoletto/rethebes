@@ -6,7 +6,7 @@ Authors: Giulio Foletto.
 
 import logging
 import json
-from util import Director
+from rethebes.util import Director
 
 class Manager(Director):
     def process_message(self, message):
