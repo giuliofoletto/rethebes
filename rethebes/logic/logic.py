@@ -29,7 +29,10 @@ default_configuration = {
         }
     ],
     "sensor": {
-        "sampling_interval": 0.1
+        "sampling_interval": 0.1,
+        "accept_incomplete_data": False,
+        "write": True,
+        "file_name": "auto" 
     },
     "timer": {
         "duration": 5

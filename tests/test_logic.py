@@ -5,6 +5,7 @@ Authors: Giulio Foletto.
 """
 
 import pytest
+import os
 import logging
 import time
 from rethebes.logic import main, process_configuration, default_configuration
@@ -23,7 +24,8 @@ def test_typical():
         ],
         "sensor": {
             "sampling_interval": 0.1,
-            "accept_incomplete_data": True
+            "accept_incomplete_data": True,
+            "write": False
         }
     }
     main(configuration)
@@ -35,7 +37,9 @@ def test_cannot_read_temperature_critical(caplog):
     configuration = {
         "instruments": ["sensor"],
         "sensor": {
-            "sampling_interval": 0.1
+            "sampling_interval": 0.1,
+            "accept_incomplete_data": False,
+            "write": False,
         }
     }
     caplog.set_level(logging.CRITICAL)
@@ -47,7 +51,8 @@ def test_time():
         "instruments": ["timer", "sensor"],
         "sensor": {
             "sampling_interval": 0.1,
-            "accept_incomplete_data": True
+            "accept_incomplete_data": True,
+            "write": False,
         },
         "timer": {
             "duration": 1
@@ -57,6 +62,24 @@ def test_time():
     main(configuration)
     stop = time.time()
     assert stop - start < configuration["timer"]["duration"] + 3 # Allow 3 seconds of grace time
+
+def test_write():
+    configuration = {
+        "instruments": ["timer", "sensor"],
+        "sensor": {
+            "sampling_interval": 0.1,
+            "accept_incomplete_data": True,
+            "write": True,
+            "file_name": "test_write.csv"
+        },
+        "timer": {
+            "duration": 1
+        }
+    }
+    main(configuration)
+    path = os.path.join("./", configuration["sensor"]["file_name"])
+    assert os.path.exists(path)
+    os.remove(path)
 
 def test_process_configuration():
     configuration = {

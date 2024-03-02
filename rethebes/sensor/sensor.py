@@ -21,7 +21,12 @@ class Sensor(Instrument):
 
     def open(self):
         self.sampling_interval = self.configuration["sampling_interval"]
-        self.start_time = time.time()        
+        self.should_write = self.configuration["write"]  
+
+        if self.should_write:
+            self.file = open(self.configuration["file_name"], "w", newline="")
+            self.writer = csv.writer(self.file, delimiter=',')
+            self.header_written = False  
 
         if "lhm_path" in self.configuration:
             sys.path.append(self.configuration["lhm_path"])
@@ -50,12 +55,9 @@ class Sensor(Instrument):
             else:
                 self.process_internal_error(msg)
 
-        self.file = open(self.configuration["file_name"], "w", newline="")
-        self.writer = csv.writer(self.file, delimiter=',')
-        self.header_written = False
-
     def close(self):
-        self.file.close()
+        if self.should_write:
+            self.file.close()
 
     def run(self):
         stop_period = time.time() + self.sampling_interval
@@ -65,10 +67,11 @@ class Sensor(Instrument):
     def act(self):
         values = {"Time": datetime.datetime.now().isoformat()}
         values.update(self.cpu.read())
-        if not self.header_written:
-            self.writer.writerow(list(values.keys()))
-            self.header_written = True
-        self.writer.writerow(list(values.values()))
+        if self.should_write:
+            if not self.header_written:
+                self.writer.writerow(list(values.keys()))
+                self.header_written = True
+            self.writer.writerow(list(values.values()))
         self.send_data(values)
     
     def send_data(self, data):
