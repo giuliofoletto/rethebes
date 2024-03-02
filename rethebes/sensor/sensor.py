@@ -4,10 +4,13 @@ Module that uses LibreHardwareMonitor to read status of CPU.
 Authors: Giulio Foletto.
 """
 import datetime
+import logging
 import time
 import sys
 import csv
 import clr
+clr.AddReference("System.IO")
+from System.IO import FileNotFoundException
 from .cpu import CPU
 from rethebes.util import Instrument
 
@@ -22,13 +25,30 @@ class Sensor(Instrument):
 
         if "lhm_path" in self.configuration:
             sys.path.append(self.configuration["lhm_path"])
-        clr.AddReference('LibreHardwareMonitorLib')
-        from LibreHardwareMonitor import Hardware
+        try:
+            clr.AddReference('LibreHardwareMonitorLib')
+            from LibreHardwareMonitor import Hardware
+        except (ImportError, FileNotFoundException):
+            self.process_internal_error("""LibreHardwareMonitorLib could not be loaded.
+                                           Check that it is installed and its directory is in the PYTHONPATH environment variable.
+                                           Alternatively, add its path to the sensor.lhm_path variable in your rethebes config.""")
+            return
         
         self.pc = Hardware.Computer()
         self.pc.IsCpuEnabled=True
         self.pc.Open()
         self.cpu = CPU(self.pc.Hardware[0])
+
+        # Test reading
+        test_read = self.cpu.read()
+        if not bool(test_read):
+            self.process_internal_error("Reading sensors failed. Check your LHM installation.")
+        elif test_read["Temperature CPU Package"] is None:
+            msg = "Could not read temperature. This is most likely due to rethebes not running with elevated privileges. Please re-execute in an elevated terminal."
+            if "accept_incomplete_data" in self.configuration and self.configuration["accept_incomplete_data"]:
+                logging.warning(msg)
+            else:
+                self.process_internal_error(msg)
 
         self.file = open(self.configuration["file_name"], "w", newline="")
         self.writer = csv.writer(self.file, delimiter=',')

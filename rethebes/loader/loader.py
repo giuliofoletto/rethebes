@@ -6,7 +6,7 @@ Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 """
 
 import os
-import sys
+import json
 import multiprocessing
 import itertools
 import logging
@@ -44,6 +44,7 @@ class Loader(Instrument):
                 load["target_loads"] = []
                 for i in range(len(load["target_cores"])):
                     load["target_loads"].append(value)
+            logging.info("Starting load: " + json.dumps(load))
             self.send_event(command = "start", **load)
 
             # Preprocess load at working level

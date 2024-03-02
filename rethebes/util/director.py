@@ -35,7 +35,6 @@ class Director(Instrument):
             thread = Thread(target = subordinate.main)
             self.threads[subordinate.name] = thread
             thread.start()
-        self.send_event(command = "start")
         logging.info("Program starts - Press CTRL+C to exit (more or less) gracefully or CTRL+BREAK to force exit")
 
     def close(self):
@@ -64,8 +63,23 @@ class Director(Instrument):
                     message = event[0].recv_json()
                     self.process_message(message)
 
+    def process_message(self, message):
+        if "command" in message["body"] and message["body"]["command"] == "critical":
+            self.send_event(command = "close")
+            self.wait_for_closure()
+            self.error = True
+        elif "command" in message["body"] and message["body"]["command"] == "ready":
+            if self.check_should_send_start():
+                self.send_event(command = "start")
+
     def check_should_continue(self):
         return bool(self.threads)
+    
+    def check_should_send_start(self):
+        c = True
+        for subordinate in self.subordinates:
+            c = c and (subordinate.get_state() == "waiting")
+        return c
     
     def wait_for_closure(self):
         names = list(self.threads.keys())

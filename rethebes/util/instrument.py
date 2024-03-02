@@ -1,4 +1,5 @@
 import datetime
+import logging
 from threading import Lock
 import zmq
 
@@ -8,6 +9,7 @@ class Instrument():
         self.context = context
         self.state_lock = Lock()
         self.sockets_ready = False
+        self.error = False
         self.set_state("opening")
 
     def release(self):
@@ -29,10 +31,15 @@ class Instrument():
         while True:
             if self.sockets_ready: # For some instruments, it might make sense to init sockets in open
                 self.listen(0)
+            if self.error:
+                logging.debug(self.name + " sets state to closing due to error")
+                self.set_state("closing")
             state = self.get_state()
+            logging.debug(self.name + " in state " + state)
             if state == "opening":
                 self.open()
                 self.set_state("waiting")
+                self.send_event(command = "ready")
             elif state == "waiting":
                 self.wait()
             elif state == "running":
@@ -101,3 +108,7 @@ class Instrument():
         for s in self.sockets.values():
             s.send_json(event)
     
+    def process_internal_error(self, description):
+        logging.critical(description)
+        self.send_event(command = "critical", description = description)
+        self.error = True
