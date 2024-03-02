@@ -27,7 +27,6 @@ if __name__ == '__main__':
         except:
             configuration = default_configuration
 
-        #m = Manager(configuration)
         configuration = main(configuration)
     elif args.mode == "analyze":
         a = Analyzer(args.file)

@@ -1,8 +1,14 @@
+"""
+App logic.
+
+Authors: Giulio Foletto.
+"""
+
+import datetime
+import zmq
 from manager import Manager
 from loader import Loader
 from sensor import Sensor
-import zmq
-import datetime
 
 OUTPUT_DIR = "./output/"
 
@@ -24,7 +30,6 @@ def main(configuration):
     sensor = Sensor("sensor", context, configuration["sensor"])
     loader = Loader("loader", context, configuration["loader"])
     manager = Manager("director", context, [sensor, loader])
-
-    manager.main()
-    
+    # This executes everything
+    manager.main()    
     context.term()

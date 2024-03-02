@@ -1,7 +1,6 @@
-import logging
 import datetime
+from threading import Lock
 import zmq
-from threading import Thread, Lock
 
 class Instrument():
     def __init__(self, name, context):
@@ -9,7 +8,6 @@ class Instrument():
         self.context = context
         self.state_lock = Lock()
         self.sockets_ready = False
-        self.init_sockets()
         self.set_state("opening")
 
     def release(self):
@@ -27,6 +25,7 @@ class Instrument():
         return state
     
     def main(self):
+        self.init_sockets()
         while True:
             if self.sockets_ready: # For some instruments, it might make sense to init sockets in open
                 self.listen(0)
