@@ -21,6 +21,10 @@ default_configuration = {
         }
     ],
     "sensor": {
-        "sampling_interval": 0.1
+        "sampling_interval": 0.1,
+        "accept_incomplete_data": True
+    },
+    "timer": {
+        "duration": 5
     }
 }

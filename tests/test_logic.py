@@ -11,6 +11,7 @@ from rethebes.logic import main, process_configuration, default_configuration
 # Tests of main logic
 def test_typical():
     configuration = {
+        "instruments": ["loader", "sensor"],
         "loader": [
             {
                 "target_cores": "all",
@@ -31,6 +32,7 @@ def test_cannot_read_temperature_critical(caplog):
     # Note: This test succeeds if there is a critical error in reading the temperature
     # This happens if the test is run without admin privileges
     configuration = {
+        "instruments": ["loader", "sensor"],
         "loader": [
             {
                 "target_cores": "all",

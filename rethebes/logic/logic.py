@@ -10,16 +10,28 @@ import zmq
 from rethebes.manager import Manager
 from rethebes.loader import Loader
 from rethebes.sensor import Sensor
+from rethebes.timer import Timer
 from .default_configuration import default_configuration
+
+known_instruments = {
+    "loader": Loader,
+    "sensor": Sensor,
+    "timer": Timer
+}
 
 def process_configuration(configuration):
     # Allow automatic list of instruments
     if "instruments" not in configuration or configuration["instruments"] == "auto":
-        configuration["instruments"] = []
-        known_instruments = ["sensor", "loader"]
-        for k in known_instruments:
-            if k in configuration:
-                configuration["instruments"].append(k)
+        configuration["instruments"] = default_configuration["instruments"]
+    # Allow not including timer
+    if "loader" not in configuration["instruments"] and "timer" not in configuration["instruments"]:
+        configuration["instruments"].append("timer")
+    # Allow automatic setting of master
+    if "master" not in configuration:
+        if "loader" in configuration["instruments"]:
+            configuration["master"] = "loader"
+        else:
+            configuration["master"] = "timer"
     # Allow loading of settings from default
     for k in configuration["instruments"]:
         if k not in configuration:
@@ -53,9 +65,8 @@ def get_default_config_directory():
 def main(configuration):
     configuration = process_configuration(configuration)
     context = zmq.Context(0)
-    sensor = Sensor("sensor", context, configuration["sensor"])
-    loader = Loader("loader", context, configuration["loader"])
-    manager = Manager("director", context, [sensor, loader])
+    instruments = [known_instruments[i](i, context, configuration[i]) for i in configuration["instruments"]]
+    manager = Manager("manager", context, instruments, configuration["master"])
     # This executes everything
     manager.main()    
     context.term()
