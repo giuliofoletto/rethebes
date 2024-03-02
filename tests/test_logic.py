@@ -94,7 +94,7 @@ def test_process_configuration():
         assert configuration[instrument] == default_configuration[instrument]
 
     configuration = {
-        "instruments": ["sensor"]
+        "instruments": ["sensor"]  # No master
     }
     configuration = process_configuration(configuration)
 
@@ -103,5 +103,32 @@ def test_process_configuration():
     assert configuration["master"] == "timer"
     for instrument in configuration["instruments"]:
         assert configuration[instrument] == default_configuration[instrument]
+
+    configuration = {
+        "instruments": ["sensor", "loader"],
+        "sensor": { # Incomplete settings
+            "write": False
+        },
+        "loader": [
+            {
+                "duration": 1
+            }
+        ]
+    }
+    configuration = process_configuration(configuration)
+
+    assert "timer" not in configuration["instruments"]
+    assert configuration["master"] == "loader"
+    for k in default_configuration["sensor"]:
+        assert k in configuration["sensor"]
+        if k != "write":
+            assert configuration["sensor"][k] == default_configuration["sensor"][k]
+    assert configuration["sensor"]["write"] == False
+    default_load = default_configuration["loader"][0]
+    for k in default_load:
+        assert k in configuration["loader"][0]
+        if k != "duration":
+            assert configuration["loader"][0][k] == default_configuration["loader"][0][k]
+    assert configuration["loader"][0]["duration"] == 1
 
 

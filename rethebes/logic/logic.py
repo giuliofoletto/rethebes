@@ -53,9 +53,21 @@ def process_configuration(configuration):
         else:
             configuration["master"] = "timer"
     # Allow loading of settings from default
-    for k in configuration["instruments"]:
-        if k not in configuration:
-            configuration[k] = default_configuration[k]
+    for instrument in configuration["instruments"]:
+        if instrument not in configuration:
+            configuration[instrument] = default_configuration[instrument]
+        else:
+            # Allow partial definition of settings
+            if instrument != "loader":
+                for k in default_configuration[instrument]:
+                    if k not in configuration[instrument]:
+                        configuration[instrument][k] = default_configuration[instrument][k]
+            else:
+                default_load = default_configuration["loader"][0]
+                for i, load in enumerate(configuration["loader"]):
+                    for k in default_load:
+                        if k not in load:
+                            configuration["loader"][i][k] = default_load[k]
     # Allow auto setting of file name
     if "sensor" in configuration and ("file_name" not in configuration["sensor"] or configuration["sensor"]["file_name"] == "auto"):
         configuration["sensor"]["file_name"] = str(get_default_output_directory()) + "/" + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
