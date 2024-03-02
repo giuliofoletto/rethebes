@@ -67,7 +67,6 @@ class Director(Instrument):
         if "command" in message["body"] and message["body"]["command"] == "critical":
             self.send_event(command = "close")
             self.wait_for_closure()
-            self.error = True
         elif "command" in message["body"] and message["body"]["command"] == "ready":
             if self.check_should_send_start():
                 self.send_event(command = "start")
