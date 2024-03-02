@@ -8,10 +8,9 @@ Authors: Giulio Foletto.
 if __name__ == '__main__':
     import argparse
     import json
-    from manager import default_configuration
     from analyzer import Analyzer
     from util import configure_logging
-    from logic import main
+    from logic import main, default_configuration
     
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", type = str, help = "Mode of operation [run|analyze]")

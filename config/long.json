@@ -1,7 +1,4 @@
 {
-    "manager": {
-        "instruments" : "auto"
-    },
     "loader":[
         {
             "target_cores": "all",

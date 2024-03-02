@@ -1,7 +1,5 @@
 default_configuration = {
-    "manager": {
-        "instruments": ["loader", "sensor"]
-    },
+    "instruments": ["loader", "sensor"],
     "loader": [
         {
             "target_cores": "all",
