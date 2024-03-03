@@ -5,6 +5,7 @@ Authors: Giulio Foletto.
 License: See project-level license file.
 """
 
+import os
 import datetime
 import logging
 import time
@@ -23,12 +24,8 @@ class Sensor(Instrument):
 
     def open(self):
         self.sampling_interval = self.configuration["sampling_interval"]
-        self.should_write = self.configuration["write"]  
-
-        if self.should_write:
-            self.file = open(self.configuration["file_name"], "w", newline="")
-            self.writer = csv.writer(self.file, delimiter=',')
-            self.header_written = False  
+        self.should_write = self.configuration["write"]
+        self.path = os.path.normpath(self.configuration["file_name"])
 
         if "lhm_path" in self.configuration:
             sys.path.append(self.configuration["lhm_path"])
@@ -56,9 +53,20 @@ class Sensor(Instrument):
                 logging.warning(msg)
             else:
                 self.process_internal_error(msg)
+                return
+
+        if self.should_write:
+            directory = os.path.abspath(os.path.dirname(self.path))
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+                logging.info("Created directory " + directory)
+            self.file = open(self.configuration["file_name"], "w", newline="")
+            self.writer = csv.writer(self.file, delimiter=',')
+            self.header_written = False
 
     def close(self):
-        if self.should_write:
+        if self.should_write and os.path.exists(self.path):
+            logging.info("Sensor data saved correctly in " + self.path)
             self.file.close()
 
     def run(self):
