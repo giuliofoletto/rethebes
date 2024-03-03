@@ -27,5 +27,5 @@ setup(name='rethebes',
           'psutil',
           'pythonnet'
       ],
-      entry_points={'console_scripts': ['rethebes = rethebes.__main__:cli']},
+      entry_points={'console_scripts': ['rethebes = rethebes.__main__:main']},
       zip_safe=False)
