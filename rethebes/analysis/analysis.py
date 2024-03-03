@@ -34,6 +34,13 @@ def format_standard_axis(data, axis):
     axis.xaxis.set_major_locator(mdates.SecondLocator(interval=get_best_tick_interval(data)))
     axis.set_xlabel("Time")
 
+def get_average_load_core(data, core_index):
+    valid_columns = []
+    for column in data.columns:
+        if ("Load CPU Core #" + str(core_index) + " Thread #") in column:
+            valid_columns.append(column)
+    return data[valid_columns].mean(axis=1)
+
 def plot_frequency(data, axis):
     num_cores = get_number_of_cores(data)
     for i in range(num_cores):
@@ -44,7 +51,7 @@ def plot_frequency(data, axis):
 def plot_load(data, axis):
     num_cores = get_number_of_cores(data)
     for i in range(num_cores):
-        axis.plot(data["Time"], 0.5*data["Load CPU Core #" + str(i+1) + " Thread #1"] + 0.5*data["Load CPU Core #" + str(i+1) + " Thread #2"], label = "C" + str(i+1))
+        axis.plot(data["Time"], get_average_load_core(data, i+1), label = "C" + str(i+1))
     axis.plot(data["Time"], data["Load CPU Total"], label = "Total", color = "k", alpha = 0.5)
     axis.set_ylabel("Load [%]")
     format_standard_axis(data, axis)
@@ -80,11 +87,15 @@ def plot_voltage(data, axis):
     format_standard_axis(data, axis)
 
 def plot_temp_vs_load(data, axis):
-    delta_t = data["Time"].diff().mean()/np.timedelta64(1, "s")
-    window = int(10 / delta_t)
-    axis.scatter(data["Load CPU Total"].rolling(window).mean(), data["Temperature Core Average"].rolling(window).mean(), label = "Avg")
-    axis.scatter(data["Load CPU Total"].rolling(window).mean(), data["Temperature Core Max"].rolling(window).mean(), label = "Max")
-    axis.set_xlabel("Load CPU Total [%]")
+    window = 20
+    num_cores = get_number_of_cores(data)
+    for i in range(num_cores):
+        x = get_average_load_core(data, i+1)
+        y = data["Temperature CPU Core #" + str(i+1)]
+        df = pd.concat({"Load": x, "Temperature": y}, axis=1)
+        df = df.sort_values("Load")
+        axis.plot(df["Load"].rolling(window).mean(), df["Temperature"].rolling(window).mean(), marker = ".", linestyle = "none", label = "C" + str(i+1))
+    axis.set_xlabel("Load [%]")
     axis.set_ylabel("Temperature [°C]")
     axis.grid()
     axis.legend()
