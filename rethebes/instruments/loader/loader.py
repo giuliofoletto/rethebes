@@ -1,8 +1,10 @@
 """
 Module that loads CPU cores.
-Based on https://github.com/GaetanoCarlucci/CPULoadGenerator/ 
+Based on https://github.com/GaetanoCarlucci/CPULoadGenerator/.
+Since the latter is MIT licensed, we include here the copyright notice, this subpackage is also MIT licensed.
 
 Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
+License: See package-level license file.
 """
 
 import os

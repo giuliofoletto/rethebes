@@ -1,8 +1,10 @@
 """
 Part of the module that loads CPU cores, this class controls the CPU status.
-Based on https://github.com/GaetanoCarlucci/CPULoadGenerator/ 
+Based on https://github.com/GaetanoCarlucci/CPULoadGenerator/.
+Since the latter is MIT licensed, we include here the copyright notice, this subpackage is also MIT licensed.
 
-Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
+Authors: Gaetano Carlucci, Giuseppe Cofano.
+License: See package-level license file.
 """
 
 from threading import Thread, Event, RLock
