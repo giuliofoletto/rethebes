@@ -7,11 +7,14 @@ License: See project-level license file.
 
 import logging
 from threading import Thread
+
 import zmq
+
 from .instrument import Instrument
 
+
 class Director(Instrument):
-    def __init__(self, name, context, subordinates = []):
+    def __init__(self, name, context, subordinates=[]):
         self.subordinates = subordinates
         self.threads = dict()
         self.sockets = dict()
@@ -35,10 +38,12 @@ class Director(Instrument):
     def open(self):
         for subordinate in self.subordinates:
             self.ready[subordinate.name] = False
-            thread = Thread(target = subordinate.main)
+            thread = Thread(target=subordinate.main)
             self.threads[subordinate.name] = thread
             thread.start()
-        logging.info("Program starts - Press CTRL+C to exit (more or less) gracefully or CTRL+BREAK to force exit")
+        logging.info(
+            "Program starts - Press CTRL+C to exit (more or less) gracefully or CTRL+BREAK to force exit"
+        )
 
     def close(self):
         logging.info("Program ends gracefully")
@@ -49,15 +54,15 @@ class Director(Instrument):
 
     def wait(self):
         if self.check_should_continue():
-            self.listen() # Exit only with a message
+            self.listen()  # Exit only with a message
         else:
             self.set_state("closing")
 
-    def listen(self, timeout = None):
+    def listen(self, timeout=None):
         try:
             events = self.poller.poll(timeout)
         except KeyboardInterrupt:
-            self.send_event(command = "close")
+            self.send_event(command="close")
             self.wait_for_closure()
             events = []
         if len(events) > 0:
@@ -68,22 +73,22 @@ class Director(Instrument):
 
     def process_message(self, message):
         if "command" in message["body"] and message["body"]["command"] == "critical":
-            self.send_event(command = "close")
+            self.send_event(command="close")
             self.wait_for_closure()
         elif "command" in message["body"] and message["body"]["command"] == "ready":
             self.ready[message["sender"]] = True
             if self.check_should_send_start():
-                self.send_event(command = "start")
+                self.send_event(command="start")
 
     def check_should_continue(self):
         return bool(self.threads)
-    
+
     def check_should_send_start(self):
         c = True
         for ready in self.ready.values():
             c = c and ready
         return c
-    
+
     def wait_for_closure(self):
         names = list(self.threads.keys())
         for name in names:

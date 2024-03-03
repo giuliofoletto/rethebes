@@ -1,7 +1,7 @@
 {
     "instruments": ["sensor", "loader"],
     "analyze": true,
-    "loader":[
+    "loader": [
         {
             "target_cores": "all",
             "target_loads": 0,

@@ -9,6 +9,7 @@ License: See package-level license file.
 
 import time
 
+
 class Actuator:
     def __init__(self, controller, monitor, duration, target):
         self.controller = controller
@@ -35,8 +36,7 @@ class Actuator:
     def run(self):
         sleep_time = 0
 
-        while self.duration < 0 \
-                or (time.time() - self.start_time) <= self.duration:
+        while self.duration < 0 or (time.time() - self.start_time) <= self.duration:
             self.controller.set_cpu(self.monitor.get_cpu_load())
             sleep_time = self.controller.get_sleep_time()
             self.generate_load(sleep_time)
@@ -52,4 +52,3 @@ class Actuator:
                 sleep_time = self.controller.get_sleep_time()
                 self.generate_load(sleep_time)
                 self.monitor.set_sleep_time(sleep_time)
-

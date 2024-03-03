@@ -7,8 +7,8 @@ Authors: Gaetano Carlucci, Giuseppe Cofano.
 License: See package-level license file.
 """
 
-from threading import Thread, Event, RLock
 import time
+from threading import Event, RLock, Thread
 
 
 class ControllerThread(Thread):
@@ -25,7 +25,7 @@ class ControllerThread(Thread):
         self.sleepTime = 0.02  # this is controller output: determines the
         # sleep time to achieve the requested CPU load
         self.alpha = 0.2  # filter coefficient
-        self.CT = 0.20  # target CPU load should be provided as input 
+        self.CT = 0.20  # target CPU load should be provided as input
         self.cpu = 0  # current CPU load returned from the Monitor thread
         self.cpuPeriod = 0.03
         if ki is None:
@@ -58,8 +58,7 @@ class ControllerThread(Thread):
 
     def set_cpu(self, cpu):
         with self.cpu_lock:
-            self.cpu = self.alpha * cpu + (
-                    1 - self.alpha) * self.cpu
+            self.cpu = self.alpha * cpu + (1 - self.alpha) * self.cpu
             # first order filter on the
             # measurement samples
 

@@ -5,18 +5,31 @@ Authors: Giulio Foletto.
 License: See project-level license file.
 """
 
-import os
 import argparse
 import json
 import logging
+import os
+
 from rethebes.analysis import analysis
+from rethebes.main import (
+    default_configuration,
+    get_default_config_directory,
+    get_default_output_directory,
+    main,
+)
 from rethebes.util import configure_logging
-from rethebes.main import main, default_configuration, get_default_config_directory, get_default_output_directory
+
 
 def cli():
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", type = str, help = "Mode of operation [run|analyze]")
-    parser.add_argument("file", type = str, nargs = "?", default = "", help = "Configuration file for run or data file for analyze")
+    parser.add_argument("mode", type=str, help="Mode of operation [run|analyze]")
+    parser.add_argument(
+        "file",
+        type=str,
+        nargs="?",
+        default="",
+        help="Configuration file for run or data file for analyze",
+    )
     args = parser.parse_args()
 
     configure_logging()
@@ -28,7 +41,7 @@ def cli():
             candidates = [
                 os.path.normpath(args.file),
                 os.path.join(get_default_config_directory(), args.file),
-                os.path.join(get_default_config_directory(), args.file + ".json")
+                os.path.join(get_default_config_directory(), args.file + ".json"),
             ]
             config_found = False
             for path in candidates:
@@ -47,7 +60,7 @@ def cli():
         candidates = [
             os.path.normpath(args.file),
             os.path.join(get_default_output_directory(), args.file),
-            os.path.join(get_default_output_directory(), args.file + ".csv")
+            os.path.join(get_default_output_directory(), args.file + ".csv"),
         ]
         analysis_file_found = False
         for path in candidates:
@@ -59,5 +72,6 @@ def cli():
             return
         analysis(path)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     cli()

@@ -8,9 +8,11 @@ License: See project-level license file.
 import datetime
 import logging
 from threading import Lock
+
 import zmq
 
-class Instrument():
+
+class Instrument:
     def __init__(self, name, context):
         self.name = name
         self.context = context
@@ -31,18 +33,20 @@ class Instrument():
         state = self.state
         self.state_lock.release()
         return state
-    
+
     def main(self):
         self.init_sockets()
         while True:
-            if self.sockets_ready: # For some instruments, it might make sense to init sockets in open
+            if (
+                self.sockets_ready
+            ):  # For some instruments, it might make sense to init sockets in open
                 self.listen(0)
             state = self.get_state()
             logging.debug(self.name + " in state " + state)
             if state == "opening":
                 self.open()
                 self.set_state("waiting")
-                self.send_event(command = "ready")
+                self.send_event(command="ready")
             elif state == "waiting":
                 self.wait()
             elif state == "running":
@@ -82,7 +86,7 @@ class Instrument():
     def wait(self):
         return self.listen()
 
-    def listen(self, timeout = None):
+    def listen(self, timeout=None):
         try:
             events = self.poller.poll(timeout)
         except KeyboardInterrupt:
@@ -110,7 +114,7 @@ class Instrument():
         event["body"] = kwargs
         for s in self.sockets.values():
             s.send_json(event)
-    
+
     def process_internal_error(self, description):
         logging.critical(description)
-        self.send_event(command = "critical", description = description)
+        self.send_event(command="critical", description=description)

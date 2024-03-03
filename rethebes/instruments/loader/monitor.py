@@ -8,9 +8,11 @@ License: See package-level license file.
 """
 
 import os
-from threading import Thread, Event, RLock
 import time
+from threading import Event, RLock, Thread
+
 import psutil
+
 
 class MonitorThread(Thread):
     def __init__(self, cpu_core, interval):
@@ -28,8 +30,13 @@ class MonitorThread(Thread):
         self.sleepTime = 0.03
         self.cpuTarget = 0.5
         self.cpu_core = cpu_core
-        self.dynamics = {"time"     : [], "cpu": [], "sleepTimeTarget": [],
-                         "cpuTarget": [], "sleepTime": [], }
+        self.dynamics = {
+            "time": [],
+            "cpu": [],
+            "sleepTimeTarget": [],
+            "cpuTarget": [],
+            "sleepTime": [],
+        }
         super(MonitorThread, self).__init__()
 
     def stop(self):
@@ -71,14 +78,13 @@ class MonitorThread(Thread):
         self.shutdown_flag.clear()
         while not self.shutdown_flag.is_set():
             self.sample = p.cpu_percent(self.sampling_interval)
-            self.set_cpu_load(self.alpha * self.sample + (
-                    1 - self.alpha) * self.cpu)
+            self.set_cpu_load(self.alpha * self.sample + (1 - self.alpha) * self.cpu)
             # first order filter on the
             # measurement samples
-            
+
             # self.cpu_log.append(self.cpu)
-            self.dynamics['time'].append(time.time() - start_time)
-            self.dynamics['cpu'].append(self.cpu)
-            self.dynamics['sleepTimeTarget'].append(self.sleepTimeTarget)
-            self.dynamics['sleepTime'].append(self.sleepTime)
-            self.dynamics['cpuTarget'].append(self.cpuTarget)
+            self.dynamics["time"].append(time.time() - start_time)
+            self.dynamics["cpu"].append(self.cpu)
+            self.dynamics["sleepTimeTarget"].append(self.sleepTimeTarget)
+            self.dynamics["sleepTime"].append(self.sleepTime)
+            self.dynamics["cpuTarget"].append(self.cpuTarget)

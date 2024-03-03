@@ -4,6 +4,7 @@ Repeatable thermal benchmarks.
 `rethebes` is a command-line utility that runs a repeatable benchmark of the CPU temperature under user-configurable load conditions.
 
 ## Requirements and installation
+
 `rethebes` has only been tested on Windows 10 and python 3.8.
 It should also be compatible with more recent Windows and python versions.
 
@@ -16,26 +17,32 @@ Note that you also need some version of the .NET runtime, but that is commonly i
 
 Then, you can install `rethebes` via `pip` or (recommended) [`pipx`](https://github.com/pypa/pipx).
 Clone this repository, `cd` into it, and then run:
+
 ```
 pipx install .
 ```
 
 ## Usage
+
 In an elevated terminal (required to access temperature sensors), run:
+
 ```
 rethebes run <config-file>
 ```
+
 where `<config-file>` is the path of a configuration file.
 See [examples/README.md](examples/README.md) for a guide about configuration files, and pre-made examples.
 
 Note that unless you specify otherwise in the configuration file, running `rethebes` creates the folder `~/.rethebes`, which is not deleted by `pipx` during if you uninstall `rethebes`.
 
 Assuming your configuration file instructed `rethebes` to save the measurements results, you can visualize them with
+
 ```
 rethebes analyze <results-file>
 ```
 
 ## Attribution
+
 The package that loads the CPU uses [code](https://github.com/GaetanoCarlucci/CPULoadGenerator/) by Gaetano Carlucci and Giuseppe Cofano (MIT licensed).
 In addition to `LibreHardwareMonitorLib` (MPL licensed), the code depends on other open source python packages that are downloaded automatically during installation.
 See [setup.py](setup.py) for the list.

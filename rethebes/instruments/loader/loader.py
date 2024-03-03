@@ -7,17 +7,21 @@ Authors: Gaetano Carlucci, Giuseppe Cofano, Giulio Foletto.
 License: See package-level license file.
 """
 
-import os
-import json
-import multiprocessing
 import itertools
+import json
 import logging
+import multiprocessing
+import os
+
 import psutil
+
+from rethebes.instrulib import Instrument
+from rethebes.util import configure_logging
+
 from .actuator import Actuator
 from .controller import ControllerThread
 from .monitor import MonitorThread
-from rethebes.instrulib import Instrument
-from rethebes.util import configure_logging
+
 
 class Loader(Instrument):
     def __init__(self, name, context, configuration):
@@ -40,7 +44,7 @@ class Loader(Instrument):
             if load["target_cores"] == "all":
                 load["target_cores"] = []
                 for i in range(self.physical_cores):
-                    load["target_cores"].append(i+1)
+                    load["target_cores"].append(i + 1)
             # Allow setting one load for the selected cores
             if not isinstance(load["target_loads"], list):
                 value = load["target_loads"]
@@ -48,36 +52,39 @@ class Loader(Instrument):
                 for i in range(len(load["target_cores"])):
                     load["target_loads"].append(value)
             logging.info("Starting load: " + json.dumps(load))
-            self.send_event(command = "start", **load)
+            self.send_event(command="start", **load)
 
             # Preprocess load at working level
             target_cores = []
             target_loads = []
             duration = load["duration"]
             sampling_interval = load["sampling_interval"]
-            
+
             # Internally, cores are grouped as two due to hyperthreading
             # At interface level, we want 1-6
             # We load a process for each of the two logical threads of each core
             for i in range(len(load["target_cores"])):
                 for j in range(self.hyperthreading):
-                    target_cores.append(2*(load["target_cores"][i]-1) + j)
+                    target_cores.append(2 * (load["target_cores"][i] - 1) + j)
 
             for i in range(len(load["target_loads"])):
                 # We attribute the requested load to each of the two logical threads
                 # Recent LHM reports load per thread, so this is consistent
                 for j in range(self.hyperthreading):
-                    target_loads.append(load["target_loads"][i]*1/100)
+                    target_loads.append(load["target_loads"][i] * 1 / 100)
 
             with multiprocessing.Pool(len(target_cores)) as pool:
-                pool.starmap(load_core, zip(
-                    target_cores,
-                    target_loads,
-                    itertools.repeat(duration),
-                    itertools.repeat(sampling_interval)
-                ))
-            self.send_event(command = "stop", **load)
-        self.send_event(command = "finish")
+                pool.starmap(
+                    load_core,
+                    zip(
+                        target_cores,
+                        target_loads,
+                        itertools.repeat(duration),
+                        itertools.repeat(sampling_interval),
+                    ),
+                )
+            self.send_event(command="stop", **load)
+        self.send_event(command="finish")
 
 
 def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):

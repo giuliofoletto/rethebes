@@ -5,17 +5,22 @@ Authors: Giulio Foletto.
 License: See project-level license file.
 """
 
-import os
+import csv
 import datetime
 import logging
-import time
+import os
 import sys
-import csv
+import time
+
 import clr
+
 clr.AddReference("System.IO")
 from System.IO import FileNotFoundException
-from .cpu import CPU
+
 from rethebes.instrulib import Instrument
+
+from .cpu import CPU
+
 
 class Sensor(Instrument):
     def __init__(self, name, context, configuration):
@@ -30,26 +35,33 @@ class Sensor(Instrument):
         if "lhm_path" in self.configuration:
             sys.path.append(self.configuration["lhm_path"])
         try:
-            clr.AddReference('LibreHardwareMonitorLib')
+            clr.AddReference("LibreHardwareMonitorLib")
             from LibreHardwareMonitor import Hardware
         except (ImportError, FileNotFoundException):
-            self.process_internal_error("""LibreHardwareMonitorLib could not be loaded.
+            self.process_internal_error(
+                """LibreHardwareMonitorLib could not be loaded.
                                            Check that it is installed and its directory is in the PYTHONPATH environment variable.
-                                           Alternatively, add its path to the sensor.lhm_path variable in your rethebes config.""")
+                                           Alternatively, add its path to the sensor.lhm_path variable in your rethebes config."""
+            )
             return
-        
+
         self.pc = Hardware.Computer()
-        self.pc.IsCpuEnabled=True
+        self.pc.IsCpuEnabled = True
         self.pc.Open()
         self.cpu = CPU(self.pc.Hardware[0])
 
         # Test reading
         test_read = self.cpu.read()
         if not bool(test_read):
-            self.process_internal_error("Reading sensors failed. Check your LHM installation.")
+            self.process_internal_error(
+                "Reading sensors failed. Check your LHM installation."
+            )
         elif test_read["Temperature CPU Package"] is None:
             msg = "Could not read temperature. This is most likely due to rethebes not running with elevated privileges. Please re-execute in an elevated terminal."
-            if "accept_incomplete_data" in self.configuration and self.configuration["accept_incomplete_data"]:
+            if (
+                "accept_incomplete_data" in self.configuration
+                and self.configuration["accept_incomplete_data"]
+            ):
                 logging.warning(msg)
             else:
                 self.process_internal_error(msg)
@@ -61,7 +73,7 @@ class Sensor(Instrument):
                 os.makedirs(directory)
                 logging.info("Created directory " + directory)
             self.file = open(self.configuration["file_name"], "w", newline="")
-            self.writer = csv.writer(self.file, delimiter=',')
+            self.writer = csv.writer(self.file, delimiter=",")
             self.header_written = False
 
     def close(self):
@@ -72,7 +84,7 @@ class Sensor(Instrument):
     def run(self):
         stop_period = time.time() + self.sampling_interval
         self.act()
-        time.sleep(max(0, stop_period-time.time()))
+        time.sleep(max(0, stop_period - time.time()))
 
     def act(self):
         values = {"Time": datetime.datetime.now().isoformat()}
@@ -83,7 +95,7 @@ class Sensor(Instrument):
                 self.header_written = True
             self.writer.writerow(list(values.values()))
         self.send_data(values)
-    
+
     def send_data(self, data):
         event = dict()
         event["sender"] = self.name

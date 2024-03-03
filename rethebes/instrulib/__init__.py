@@ -1,2 +1,2 @@
-from .instrument import Instrument
 from .director import Director
+from .instrument import Instrument

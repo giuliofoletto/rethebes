@@ -8,6 +8,7 @@ Authors: Giulio Foletto.
 License: See project-level license file.
 """
 
+
 class CPU:
     def __init__(self, hw):
         self.hw = hw
@@ -19,7 +20,7 @@ class CPU:
         for key, index in self.sensors.items():
             self.latest_values[key] = self.hw.Sensors[index].Value
         return self.latest_values
-    
+
     def discover_sensors(self):
         self.hw.Update()
         index = 0
