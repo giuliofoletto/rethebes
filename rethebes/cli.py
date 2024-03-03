@@ -10,9 +10,9 @@ def cli():
     import argparse
     import json
     import logging
-    from rethebes.analyzer import Analyzer
+    from rethebes.analysis import analysis
     from rethebes.util import configure_logging
-    from rethebes.logic import main, default_configuration, get_default_config_directory
+    from rethebes.logic import main, default_configuration, get_default_config_directory, get_default_output_directory
     
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", type = str, help = "Mode of operation [run|analyze]")
@@ -44,7 +44,20 @@ def cli():
                 return
         main(configuration)
     elif args.mode == "analyze":
-        a = Analyzer(args.file)
+        candidates = [
+            os.path.normpath(args.file),
+            os.path.join(get_default_output_directory(), args.file),
+            os.path.join(get_default_output_directory(), args.file + ".csv")
+        ]
+        analysis_file_found = False
+        for path in candidates:
+            if os.path.exists(path):
+                analysis_file_found = True
+                break
+        if not analysis_file_found:
+            logging.critical("File to analyze not found")
+            return
+        analysis(path)
 
 if __name__ == '__main__':
     cli()
