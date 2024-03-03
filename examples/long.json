@@ -1,5 +1,6 @@
 {
     "instruments": ["sensor", "loader"],
+    "analyze": true,
     "loader":[
         {
             "target_cores": "all",

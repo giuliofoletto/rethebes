@@ -1,5 +1,6 @@
 {
     "instruments": ["sensor", "timer"],
+    "analyze": true,
     "sensor": {
         "sampling_interval": 0.1
     },

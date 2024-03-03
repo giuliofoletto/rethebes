@@ -9,6 +9,7 @@ import datetime
 import os
 import zmq
 from rethebes.instruments import Loader, Manager, Sensor, Timer
+from rethebes.analysis import analysis
 
 known_instruments = {
     "loader": Loader,
@@ -18,6 +19,7 @@ known_instruments = {
 
 default_configuration = {
     "instruments": ["loader", "sensor"],
+    "analyze": False,
     "loader": [
         {
             "target_cores": "all",
@@ -50,6 +52,9 @@ def process_configuration(configuration):
             configuration["master"] = "loader"
         else:
             configuration["master"] = "timer"
+    # Allow not setting analyze after run
+    if "analyze" not in configuration:
+        configuration["analyze"] = default_configuration["analyze"]
     # Allow loading of settings from default
     for instrument in configuration["instruments"]:
         if instrument not in configuration:
@@ -68,7 +73,8 @@ def process_configuration(configuration):
                             configuration["loader"][i][k] = default_load[k]
     # Allow auto setting of file name
     if "sensor" in configuration and ("file_name" not in configuration["sensor"] or configuration["sensor"]["file_name"] == "auto"):
-        configuration["sensor"]["file_name"] = str(get_default_output_directory()) + "/" + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
+        file_name = datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
+        configuration["sensor"]["file_name"] = os.path.join(get_default_output_directory(), file_name)
     return configuration
 
 def get_default_global_directory(create = False):
@@ -100,3 +106,5 @@ def main(configuration):
     # This executes everything
     manager.main()    
     context.term()
+    if configuration["analyze"] and configuration["sensor"]["write"]:
+        analysis(configuration["sensor"]["file_name"])
