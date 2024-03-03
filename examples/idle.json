@@ -1,0 +1,10 @@
+{
+    "instruments": ["sensor", "timer"],
+    "sensor": {
+        "sampling_interval": 0.1
+    },
+    "timer": {
+        "duration": 60,
+        "file_name": "auto"
+    }
+}
