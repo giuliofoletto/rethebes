@@ -7,10 +7,7 @@ Authors: Giulio Foletto.
 import datetime
 import os
 import zmq
-from rethebes.manager import Manager
-from rethebes.loader import Loader
-from rethebes.sensor import Sensor
-from rethebes.timer import Timer
+from rethebes.instruments import Loader, Manager, Sensor, Timer
 
 known_instruments = {
     "loader": Loader,
