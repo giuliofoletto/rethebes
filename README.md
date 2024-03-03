@@ -38,8 +38,27 @@ Note that unless you specify otherwise in the configuration file, running `rethe
 Assuming your configuration file instructed `rethebes` to save the measurements results, you can visualize them with
 
 ```
-rethebes analyze <results-file>
+rethebes analyze <output-file>
 ```
+
+## Tricks
+
+For convenience, if you place your configuration file in the default folder (`~/.rethebes/config/`), you can invoke it via name only, without necessarily including the full path or the extension.
+For instance
+
+```
+rethebes run short
+```
+
+will work if file `~/.rethebes/config/short.json` exists.
+
+You can do the same for output files (in `~/.rethebes/output/`):
+
+```
+rethebes analyze foobar
+```
+
+will work if file `~/.rethebes/output/foobar.csv` exists.
 
 ## Attribution
 

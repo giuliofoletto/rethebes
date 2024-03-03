@@ -11,6 +11,6 @@
     ],
     "sensor": {
         "sampling_interval": 0.1,
-        "file_name": "auto"
+        "write": false
     }
 }
