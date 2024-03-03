@@ -13,6 +13,8 @@ class Director(Instrument):
     def __init__(self, name, context, subordinates = []):
         self.subordinates = subordinates
         self.threads = dict()
+        self.sockets = dict()
+        self.ready = dict()
         super().__init__(name, context)
 
     def release(self):
@@ -22,7 +24,6 @@ class Director(Instrument):
 
     def init_sockets(self):
         self.poller = zmq.Poller()
-        self.sockets = dict()
         for subordinate in self.subordinates:
             socket = self.context.socket(zmq.PAIR)
             socket.bind("inproc://" + subordinate.name)
@@ -32,6 +33,7 @@ class Director(Instrument):
 
     def open(self):
         for subordinate in self.subordinates:
+            self.ready[subordinate.name] = False
             thread = Thread(target = subordinate.main)
             self.threads[subordinate.name] = thread
             thread.start()
@@ -68,6 +70,7 @@ class Director(Instrument):
             self.send_event(command = "close")
             self.wait_for_closure()
         elif "command" in message["body"] and message["body"]["command"] == "ready":
+            self.ready[message["sender"]] = True
             if self.check_should_send_start():
                 self.send_event(command = "start")
 
@@ -76,8 +79,8 @@ class Director(Instrument):
     
     def check_should_send_start(self):
         c = True
-        for subordinate in self.subordinates:
-            c = c and (subordinate.get_state() == "waiting")
+        for ready in self.ready:
+            c = c and ready
         return c
     
     def wait_for_closure(self):
