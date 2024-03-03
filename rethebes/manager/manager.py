@@ -4,7 +4,7 @@ Core logic singlet.
 Authors: Giulio Foletto.
 """
 
-from rethebes.util import Director
+from rethebes.instrulib import Director
 
 class Manager(Director):
     def __init__(self, name, context, subordinates, master):

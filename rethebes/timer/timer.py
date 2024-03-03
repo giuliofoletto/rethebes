@@ -6,7 +6,7 @@ Authors: Giulio Foletto.
 
 import time
 import logging
-from rethebes.util import Instrument
+from rethebes.instrulib import Instrument
 
 class Timer(Instrument):
     def __init__(self, name, context, configuration):

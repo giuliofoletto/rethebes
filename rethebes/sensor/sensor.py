@@ -12,7 +12,7 @@ import clr
 clr.AddReference("System.IO")
 from System.IO import FileNotFoundException
 from .cpu import CPU
-from rethebes.util import Instrument
+from rethebes.instrulib import Instrument
 
 class Sensor(Instrument):
     def __init__(self, name, context, configuration):

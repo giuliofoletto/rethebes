@@ -14,7 +14,7 @@ import psutil
 from .actuator import Actuator
 from .controller import ControllerThread
 from .monitor import MonitorThread
-from rethebes.util import Instrument, configure_logging
+from rethebes.instrulib import Instrument, configure_logging
 
 class Loader(Instrument):
     def __init__(self, name, context, configuration):
