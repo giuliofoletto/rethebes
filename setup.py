@@ -25,7 +25,11 @@ setup(name='rethebes',
       package_dir={'rethebes': 'rethebes'},
       install_requires=[
           'psutil',
-          'pythonnet'
+          'pythonnet',
+          'pyzmq',
+          'pandas',
+          'matplotlib',
+          'numpy'
       ],
       entry_points={'console_scripts': ['rethebes = rethebes.__main__:main']},
       zip_safe=False)
