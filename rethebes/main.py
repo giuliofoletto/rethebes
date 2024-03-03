@@ -71,24 +71,24 @@ def process_configuration(configuration):
         configuration["sensor"]["file_name"] = str(get_default_output_directory()) + "/" + datetime.datetime.now().isoformat(sep = "-", timespec="seconds").replace(":", "-") + ".csv"
     return configuration
 
-def get_default_global_directory():
+def get_default_global_directory(create = False):
     user_dir = os.path.expanduser("~")
-    rethebes_dir = os.path.join(user_dir, "rethebes")
-    if not os.path.exists(rethebes_dir):
+    rethebes_dir = os.path.join(user_dir, ".rethebes")
+    if create and not os.path.exists(rethebes_dir):
         os.makedirs(rethebes_dir)
     return rethebes_dir
 
-def get_default_output_directory():
+def get_default_output_directory(create = False):
     rethebes_dir = get_default_global_directory()
     output_dir = os.path.join(rethebes_dir, "output")
-    if not os.path.exists(output_dir):
+    if create and not os.path.exists(output_dir):
         os.makedirs(output_dir)
     return output_dir
 
-def get_default_config_directory():
+def get_default_config_directory(create = False):
     rethebes_dir = get_default_global_directory()
     config_dir = os.path.join(rethebes_dir, "config")
-    if not os.path.exists(config_dir):
+    if create and not os.path.exists(config_dir):
         os.makedirs(config_dir)
     return config_dir
 
