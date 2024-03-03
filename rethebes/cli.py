@@ -4,16 +4,15 @@ Main script to run the application.
 Authors: Giulio Foletto.
 """
 
-# Encapsulation in condition is necessary because otherwise subprocess might re-execute this module.
+import os
+import argparse
+import json
+import logging
+from rethebes.analysis import analysis
+from rethebes.util import configure_logging
+from rethebes.logic import main, default_configuration, get_default_config_directory, get_default_output_directory
+
 def cli():
-    import os
-    import argparse
-    import json
-    import logging
-    from rethebes.analysis import analysis
-    from rethebes.util import configure_logging
-    from rethebes.logic import main, default_configuration, get_default_config_directory, get_default_output_directory
-    
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", type = str, help = "Mode of operation [run|analyze]")
     parser.add_argument("file", type = str, nargs = "?", default = "", help = "Configuration file for run or data file for analyze")
