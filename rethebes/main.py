@@ -1,7 +1,8 @@
 """
-App logic.
+Functions that define the app logic.
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
 
 import datetime

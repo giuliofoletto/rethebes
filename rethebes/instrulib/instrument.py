@@ -1,3 +1,10 @@
+"""
+Generic class for an instrument, which is a state machine that acts based on messages.
+
+Authors: Giulio Foletto.
+License: See project-level license file.
+"""
+
 import datetime
 import logging
 from threading import Lock

@@ -2,6 +2,7 @@
 Allow rethebes to be executable through `python -m rethebes`.
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
 
 # Encapsulation in condition is necessary because otherwise subprocess might re-execute this module.

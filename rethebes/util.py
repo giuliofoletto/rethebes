@@ -1,3 +1,10 @@
+"""
+Shared utility functions.
+
+Authors: Giulio Foletto.
+License: See project-level license file.
+"""
+
 import sys
 import logging
 

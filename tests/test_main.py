@@ -1,7 +1,8 @@
 """
-Test facility.
+Main test facility.
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
 
 import pytest

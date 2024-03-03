@@ -5,6 +5,7 @@ for i in range(50): # arbitrary big number
     print(i, self.hw.Sensors[i].Name, self.hw.Sensors[i].SensorType)
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
 
 class CPU:

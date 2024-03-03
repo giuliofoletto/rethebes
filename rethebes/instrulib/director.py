@@ -2,6 +2,7 @@
 Generic director class that controls multiple instruments.
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
 
 import logging

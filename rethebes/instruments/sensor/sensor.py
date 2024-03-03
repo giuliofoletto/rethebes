@@ -2,7 +2,9 @@
 Module that uses LibreHardwareMonitor to read status of CPU.
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
+
 import datetime
 import logging
 import time

@@ -1,3 +1,10 @@
+"""
+Function to analyse results of measurement.
+
+Authors: Giulio Foletto.
+License: See project-level license file.
+"""
+
 import logging
 import pandas as pd
 import numpy as np

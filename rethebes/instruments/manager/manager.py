@@ -1,7 +1,8 @@
 """
-Core logic singlet.
+The director of the instruments used by rethebes.
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
 
 from rethebes.instrulib import Director

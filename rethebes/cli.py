@@ -1,7 +1,8 @@
 """
-Main script to run the application.
+Main script to run the application, contains user interface.
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
 
 import os

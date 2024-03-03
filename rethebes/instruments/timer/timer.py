@@ -2,6 +2,7 @@
 Class that implements a basic timer instruments, which essentially stops others after some time.
 
 Authors: Giulio Foletto.
+License: See project-level license file.
 """
 
 import time
