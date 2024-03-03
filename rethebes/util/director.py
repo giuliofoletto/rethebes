@@ -79,7 +79,7 @@ class Director(Instrument):
     
     def check_should_send_start(self):
         c = True
-        for ready in self.ready:
+        for ready in self.ready.values():
             c = c and ready
         return c
     
