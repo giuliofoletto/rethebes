@@ -7,7 +7,7 @@ Authors: Giulio Foletto.
 import logging
 from threading import Thread
 import zmq
-from rethebes.util import Instrument
+from .instrument import Instrument
 
 class Director(Instrument):
     def __init__(self, name, context, subordinates = []):
