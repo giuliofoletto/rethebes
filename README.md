@@ -15,11 +15,10 @@ Internally, `rethebes` uses [`LibreHardwareMonitorLib`](https://github.com/Libre
 
 Note that you also need some version of the .NET runtime, but that is commonly installed in Windows.
 
-Then, you can install `rethebes` via `pip` or (recommended) [`pipx`](https://github.com/pypa/pipx).
-Clone this repository, `cd` into it, and then run:
+Then, you can install `rethebes` from github via `pip` or (recommended) [`pipx`](https://github.com/pypa/pipx).
 
 ```
-pipx install .
+pipx install git+https://github.com/giuliofoletto/rethebes
 ```
 
 ## Usage

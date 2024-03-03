@@ -22,6 +22,7 @@ setup(
     description="Repeatable thermal benchmarks",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    url="https://github.com/giuliofoletto/rethebes",
     author="Giulio Foletto",
     author_email="giulio.foletto@outlook.com",
     license="Apache",
