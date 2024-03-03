@@ -8,7 +8,7 @@ import pytest
 import os
 import logging
 import time
-from rethebes.logic import main, process_configuration, default_configuration
+from rethebes.main import main, process_configuration, default_configuration
 
 # Tests of main logic
 def test_typical():

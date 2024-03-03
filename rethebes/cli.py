@@ -10,7 +10,7 @@ import json
 import logging
 from rethebes.analysis import analysis
 from rethebes.util import configure_logging
-from rethebes.logic import main, default_configuration, get_default_config_directory, get_default_output_directory
+from rethebes.main import main, default_configuration, get_default_config_directory, get_default_output_directory
 
 def cli():
     parser = argparse.ArgumentParser()
