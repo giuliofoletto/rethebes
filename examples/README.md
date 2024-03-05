@@ -39,4 +39,4 @@ For example, to stress all cores to 50% for 10 seconds, and then cores 1 to 35% 
 Note that cores are numbered from 1 here.
 
 The key `"analyze": true`, specifies that you want to visualize the results after the measurement.
-Otherwise the measurement ends and you can visualize the results later using `rethebes analyze <output-file>`
+Otherwise the measurement ends and you can visualize the results later using `rethebes analyze <output-file>`.

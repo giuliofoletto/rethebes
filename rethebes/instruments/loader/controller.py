@@ -13,28 +13,26 @@ from threading import Event, RLock, Thread
 
 class ControllerThread(Thread):
     def __init__(self, interval, ki=None, kp=None):
-        # synchronization
+        # Synchronization variables
         self.shutdown_flag = Event()
         self.sleep_lock = RLock()
         self.cpu_lock = RLock()
         self.target_lock = RLock()
 
-        self.running = 1  # thread status
         self.sampling_interval = interval
-        self.period = 0.1  # actuation period  in seconds
-        self.sleepTime = 0.02  # this is controller output: determines the
-        # sleep time to achieve the requested CPU load
+        self.period = 0.1  # actuation period and maximum sleep time
+        self.sleep_time = 0.02  # this is controller output and represents the sleep time to achieve the requested CPU load
+        self.cpu_period = 0.03  # time of not sleep (cpu period + sleep time = period)
         self.alpha = 0.2  # filter coefficient
-        self.CT = 0.20  # target CPU load should be provided as input
-        self.cpu = 0  # current CPU load returned from the Monitor thread
-        self.cpuPeriod = 0.03
+        self.cpu_target = 0.20  # target CPU load should be provided as input (modified by parent object)
+        self.cpu_load = 0  # current CPU load returned from the Monitor thread
         if ki is None:
             self.ki = 0.2  # integral constant of th PI regulator
         if kp is None:
             self.kp = 0.02  # proportional constant of th PI regulator
-        self.int_err = 0  # integral error
+        self.int_err = 0  # integral error (initialized to 0)
         self.last_ts = time.time()  # last sampled time
-        self.err = 0
+        self.err = 0  # current error
         super(ControllerThread, self).__init__()
 
     def stop(self):
@@ -42,62 +40,58 @@ class ControllerThread(Thread):
 
     def get_sleep_time(self):
         with self.sleep_lock:
-            return self.sleepTime
+            return self.sleep_time
 
     def set_sleep_time(self, sleep_time):
         with self.sleep_lock:
-            self.sleepTime = sleep_time
+            self.sleep_time = sleep_time
 
     def get_cpu_target(self):
         with self.target_lock:
-            return self.CT
+            return self.cpu_target
 
-    def set_cpu_target(self, CT):
+    def set_cpu_target(self, cpu_target):
         with self.target_lock:
-            self.CT = CT
+            self.cpu_target = cpu_target
 
-    def set_cpu(self, cpu):
+    def set_cpu_load(self, cpu_load):
         with self.cpu_lock:
-            self.cpu = self.alpha * cpu + (1 - self.alpha) * self.cpu
-            # first order filter on the
-            # measurement samples
+            # Apply first order filter to the measurement samples
+            self.cpu_load = self.alpha * cpu_load + (1 - self.alpha) * self.cpu_load
 
-    def get_cpu(self):
+    def get_cpu_load(self):
         with self.cpu_lock:
-            return self.cpu
+            return self.cpu_load
 
     def run(self):
-        def cpu_model(cpu_period):
+        def calculate_output_sleep_time(cpu_period):
             sleep_time = self.period - cpu_period
             return sleep_time
 
         self.shutdown_flag.clear()
         while not self.shutdown_flag.is_set():
-            # ControllerThread has to have the same sampling interval as
-            # MonitorThread
+            # Must be the same sampling interval of monitor
             time.sleep(self.sampling_interval)
 
             # get all variables
             with self.target_lock, self.cpu_lock:
-                CT = self.CT
-                cpu = self.cpu
+                cpu_target = self.cpu_target
+                cpu = self.cpu_load
 
-            self.err = CT - cpu * 0.01  # computes the proportional
-            #  error
+            self.err = cpu_target - cpu * 0.01  # current error
             ts = time.time()
 
             samp_int = ts - self.last_ts  # sample interval
-            self.int_err = self.int_err + self.err * samp_int  # computes the
-            #  integral error
+            self.int_err = self.int_err + self.err * samp_int  # integral error
             self.last_ts = ts
-            self.cpuPeriod = self.kp * self.err + self.ki * self.int_err
+            self.cpu_period = self.kp * self.err + self.ki * self.int_err
 
             # anti wind up control
-            if self.cpuPeriod < 0:
-                self.cpuPeriod = 0
+            if self.cpu_period < 0:
+                self.cpu_period = 0
                 self.int_err = self.int_err - self.err * samp_int
-            if self.cpuPeriod > self.period:
-                self.cpuPeriod = self.period
+            if self.cpu_period > self.period:
+                self.cpu_period = self.period
                 self.int_err = self.int_err - self.err * samp_int
 
-            self.set_sleep_time(cpu_model(self.cpuPeriod))
+            self.set_sleep_time(calculate_output_sleep_time(self.cpu_period))

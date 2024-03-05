@@ -11,11 +11,11 @@ It should also be compatible with more recent Windows and python versions.
 Internally, `rethebes` uses [`LibreHardwareMonitorLib`](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor), which is not distributed with `rethebes` and must be installed separately. To do so, you must:
 
 1. Download it from the [Releases page on github](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases/tag/v0.9.3).
-2. Add the directory where you have extracted `LibreHardwareMonitorLib.dll` to your `PYTHONNET` environment variable in Windows.
+2. Add the directory where you have extracted `LibreHardwareMonitorLib.dll` to your `PYTHONPATH` environment variable in Windows.
 
 Note that you also need some version of the .NET runtime, but that is commonly installed in Windows.
 
-Then, you can install `rethebes` from github via `pip` or (recommended) [`pipx`](https://github.com/pypa/pipx).
+Then, you can install `rethebes` from github via `pip` or (recommended) [`pipx`](https://github.com/pypa/pipx):
 
 ```
 pipx install git+https://github.com/giuliofoletto/rethebes

@@ -61,7 +61,7 @@ class Loader(Instrument):
             sampling_interval = load["sampling_interval"]
 
             # Internally, cores are grouped as two due to hyperthreading
-            # At interface level, we want 1-6
+            # At interface level, we want to start from 1 and get to number of cores
             # We load a process for each of the two logical threads of each core
             for i in range(len(load["target_cores"])):
                 for j in range(self.hyperthreading):
