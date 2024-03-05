@@ -25,13 +25,15 @@ class Actuator:
 
     def generate_load(self, sleep_time):
         interval = time.time() + self.period - sleep_time
+        dummy = 213123
         # generates some load for interval seconds
         while time.time() < interval:
-            pr = 213123
-            _ = pr * pr
-            pr = pr + 1
-
+            dummy = self.compute(dummy)
         time.sleep(sleep_time)
+
+    def compute(self, dummy):
+        _ = dummy * dummy
+        return dummy + 1
 
     def run(self):
         while self.duration < 0 or (time.time() - self.start_time) <= self.duration:
