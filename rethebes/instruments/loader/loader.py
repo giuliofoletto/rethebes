@@ -45,6 +45,9 @@ class Loader(Instrument):
                 load["target_cores"] = []
                 for i in range(self.physical_cores):
                     load["target_cores"].append(i + 1)
+            # Allow setting one core without writing it as a list
+            if isinstance(load["target_cores"], int):
+                load["target_cores"] = [load["target_cores"]]
             # Allow setting one load for the selected cores
             if not isinstance(load["target_loads"], list):
                 value = load["target_loads"]
