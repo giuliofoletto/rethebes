@@ -87,6 +87,8 @@ class Loader(Instrument):
                     ),
                 )
             self.send_event(command="stop", **load)
+        # Single runner, go to waiting to be safe and avoid spurious run
+        self.set_state("waiting")
         self.send_event(command="finish")
 
 
