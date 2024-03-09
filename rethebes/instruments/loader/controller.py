@@ -12,15 +12,15 @@ from threading import Event, RLock, Thread
 
 
 class ControllerThread(Thread):
-    def __init__(self, interval, ki=None, kp=None):
+    def __init__(self, sampling_interval=0.1, ki=None, kp=None):
         # Synchronization variables
         self.shutdown_flag = Event()
         self.sleep_lock = RLock()
         self.cpu_lock = RLock()
         self.target_lock = RLock()
 
-        self.sampling_interval = interval
-        self.period = 0.1  # actuation period and maximum sleep time
+        self.sampling_interval = sampling_interval
+        self.reference_period = 0.1  # actuation period and reference for the sleep time
         self.sleep_time = 0.02  # this is controller output and represents the sleep time to achieve the requested CPU load
         self.cpu_period = 0.03  # time of not sleep (cpu period + sleep time = period)
         self.alpha = 0.2  # filter coefficient
@@ -65,7 +65,7 @@ class ControllerThread(Thread):
 
     def run(self):
         def calculate_output_sleep_time(cpu_period):
-            sleep_time = self.period - cpu_period
+            sleep_time = self.reference_period - cpu_period
             return sleep_time
 
         self.shutdown_flag.clear()
@@ -76,9 +76,11 @@ class ControllerThread(Thread):
             # get all variables
             with self.target_lock, self.cpu_lock:
                 cpu_target = self.cpu_target
-                cpu = self.cpu_load
+                cpu_load = self.cpu_load
 
-            self.err = cpu_target - cpu * 0.01  # current error
+            # Note that if the cpu_load is too high, the error is negative
+            # This leads to a decrease of cpu_period and in turn to an increase of sleep_time
+            self.err = cpu_target - cpu_load  # current error
             ts = time.time()
 
             samp_int = ts - self.last_ts  # sample interval
@@ -90,8 +92,8 @@ class ControllerThread(Thread):
             if self.cpu_period < 0:
                 self.cpu_period = 0
                 self.int_err = self.int_err - self.err * samp_int
-            if self.cpu_period > self.period:
-                self.cpu_period = self.period
+            if self.cpu_period > self.reference_period:
+                self.cpu_period = self.reference_period
                 self.int_err = self.int_err - self.err * samp_int
 
             self.set_sleep_time(calculate_output_sleep_time(self.cpu_period))

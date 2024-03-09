@@ -17,14 +17,16 @@ class Actuator:
         self.duration = duration
         self.target = target
         self.controller.set_cpu_load(self.monitor.get_cpu_load())
-        self.period = 0.05  # actuation period in seconds
+        # The actuation period (in seconds) should not be bigger than the controller reference period
+        # However they need not be the same, and originally this was set at 0.05, while reference was 0.1
+        self.actuation_period = 0.05
         self.start_time = time.time()
 
     def close(self):
         pass  # NOOP
 
     def generate_load(self, sleep_time):
-        interval = time.time() + self.period - sleep_time
+        interval = time.time() + self.actuation_period - sleep_time
         dummy = 213123
         # generates some load for interval seconds
         while time.time() < interval:

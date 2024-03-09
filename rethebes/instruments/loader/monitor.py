@@ -27,7 +27,9 @@ class MonitorThread(Thread):
         self.cpu_load = 0.5  # cpu load filtered (with useless initial value)
         self.alpha = 1  # filter coefficient
         self.sleep_time = 0.03  # useful only for Actuator.run_sequence, which is unused
-        self.sleep_time_target = 0.03  # useful only for Actuator.run_sequence, which is unused
+        self.sleep_time_target = (
+            0.03  # useful only for Actuator.run_sequence, which is unused
+        )
         self.cpu_target = 0.5  # useful only for Actuator.run_sequence, which is unused
 
         super(MonitorThread, self).__init__()
@@ -60,5 +62,5 @@ class MonitorThread(Thread):
         while not self.shutdown_flag.is_set():
             # Get the cpu utilization percentage, by the current process
             # in the interval of length self.sampling_interval (blocking)
-            self.sample = p.cpu_percent(self.sampling_interval)
+            self.sample = p.cpu_percent(self.sampling_interval) * 1 / 100
             self.set_cpu_load(self.sample)
