@@ -14,17 +14,27 @@ from rethebes.instrulib import Instrument
 class Timer(Instrument):
     def __init__(self, name, context, configuration):
         self.configuration = configuration
-        self.stop_time_set = False
+        self.first_run = True
         super().__init__(name, context)
 
     def run(self):
-        logging.info(
-            "Starting timer for " + str(self.configuration["duration"]) + " seconds"
-        )
-        if not self.stop_time_set:
-            self.stop_time = time.time() + self.configuration["duration"]
-            self.stop_time_set = True
-        self.listen((self.stop_time - time.time()) * 1000)  # Conversion to ms
-        if time.time() > self.stop_time:
-            self.send_event(command="finish")
-            self.set_state("waiting")
+        if self.configuration["duration"] < 0:  # infinite run
+            if self.first_run:
+                logging.info(
+                    "Starting infinite acquisition. Must be stopped with CTRL+C."
+                )
+                self.first_run = False
+            self.listen()
+        else:
+            if self.first_run:
+                logging.info(
+                    "Starting timer for "
+                    + str(self.configuration["duration"])
+                    + " seconds"
+                )
+                self.stop_time = time.time() + self.configuration["duration"]
+                self.first_run = False
+            self.listen((self.stop_time - time.time()) * 1000)  # Conversion to ms
+            if time.time() > self.stop_time:
+                self.send_event(command="finish")
+                self.set_state("waiting")

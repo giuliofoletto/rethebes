@@ -3,7 +3,7 @@
 In this folder you can find some example configuration files.
 At the moment, these are:
 
--   [`idle.json`](idle.json): Just log the sensor measurements without stressing the CPU in any way for 60 seconds.
+-   [`idle.json`](idle.json): Just log the sensor measurements without stressing the CPU in any way until CTRL+C is pressed.
 -   [`long.json`](long.json): Stress all cores from 0 to 100% and back, for 30 seconds each.
     This lasts approximately 10m30s.
 -   [`short.json`](short.json): For testing purposes, use the `loader` module but stress the CPU at the minimum level for 5 seconds, without saving files.

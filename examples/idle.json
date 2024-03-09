@@ -2,10 +2,10 @@
     "instruments": ["sensor", "timer"],
     "analyze": true,
     "sensor": {
-        "sampling_interval": 0.1
+        "sampling_interval": 0.1,
+        "file_name": "auto"
     },
     "timer": {
-        "duration": 60,
-        "file_name": "auto"
+        "duration": -1
     }
 }
