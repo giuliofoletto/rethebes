@@ -101,10 +101,10 @@ def load_core(target_core, target_load, duration=-1, sampling_interval=0.1):
     process.cpu_affinity([target_core])
 
     monitor = MonitorThread(target_core, sampling_interval)
-    control = ControllerThread(sampling_interval)
+    control = ControllerThread(sampling_interval, 0.1)
     control.set_cpu_target(target_load)
 
-    actuator = Actuator(control, monitor, duration, target_core)
+    actuator = Actuator(control, monitor, duration, target_core, 0.05)
 
     try:
         monitor.start()

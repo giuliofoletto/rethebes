@@ -11,7 +11,7 @@ import time
 
 
 class Actuator:
-    def __init__(self, controller, monitor, duration, target):
+    def __init__(self, controller, monitor, duration, target, actuation_period):
         self.controller = controller
         self.monitor = monitor
         self.duration = duration
@@ -19,7 +19,7 @@ class Actuator:
         self.controller.set_cpu_load(self.monitor.get_cpu_load())
         # The actuation period (in seconds) should not be bigger than the controller reference period
         # However they need not be the same, and originally this was set at 0.05, while reference was 0.1
-        self.actuation_period = 0.05
+        self.actuation_period = actuation_period
         self.start_time = time.time()
 
     def close(self):

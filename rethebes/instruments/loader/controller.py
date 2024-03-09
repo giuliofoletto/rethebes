@@ -12,7 +12,7 @@ from threading import Event, RLock, Thread
 
 
 class ControllerThread(Thread):
-    def __init__(self, sampling_interval=0.1, ki=None, kp=None):
+    def __init__(self, sampling_interval=0.1, reference_period=0.1, ki=None, kp=None):
         # Synchronization variables
         self.shutdown_flag = Event()
         self.sleep_lock = RLock()
@@ -20,7 +20,9 @@ class ControllerThread(Thread):
         self.target_lock = RLock()
 
         self.sampling_interval = sampling_interval
-        self.reference_period = 0.1  # actuation period and reference for the sleep time
+        self.reference_period = (
+            reference_period  # actuation period and reference for the sleep time
+        )
         self.sleep_time = 0.02  # this is controller output and represents the sleep time to achieve the requested CPU load
         self.cpu_period = 0.03  # time of not sleep (cpu period + sleep time = period)
         self.alpha = 0.2  # filter coefficient
