@@ -32,6 +32,8 @@ def cli():
     )
     args = parser.parse_args()
 
+    # Called here (although its called also in __main__)
+    # so that even if cli() is called directly, the logging works properly
     configure_logging()
 
     if args.mode == "run":
