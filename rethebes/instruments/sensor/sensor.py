@@ -9,13 +9,9 @@ import csv
 import datetime
 import logging
 import os
-import sys
 import time
 
-import clr
-
-clr.AddReference("System.IO")
-from System.IO import FileNotFoundException
+from HardwareMonitor import Hardware
 
 from rethebes.instrulib import Instrument
 
@@ -31,19 +27,6 @@ class Sensor(Instrument):
         self.sampling_interval = self.configuration["sampling_interval"]
         self.should_write = self.configuration["write"]
         self.path = os.path.normpath(self.configuration["file_name"])
-
-        if "lhm_path" in self.configuration:
-            sys.path.append(self.configuration["lhm_path"])
-        try:
-            clr.AddReference("LibreHardwareMonitorLib")
-            from LibreHardwareMonitor import Hardware
-        except (ImportError, FileNotFoundException):
-            self.process_internal_error(
-                """LibreHardwareMonitorLib could not be loaded.
-                                           Check that it is installed and its directory is in the PYTHONPATH environment variable.
-                                           Alternatively, add its path to the sensor.lhm_path variable in your rethebes config."""
-            )
-            return
 
         self.pc = Hardware.Computer()
         self.pc.IsCpuEnabled = True
