@@ -28,7 +28,14 @@ setup(
     license="Apache",
     license_files=("LICENSE.txt", "NOTICE.txt"),
     packages=find_packages(),
-    install_requires=["psutil", "pythonnet", "pyzmq", "pandas", "matplotlib", "numpy"],
+    install_requires=[
+        "psutil",
+        "pyhardwaremonitor @ git+https://github.com/snip3rnick/PyHardwareMonitor.git",  # incompatible with PyPI
+        "pyzmq",
+        "pandas",
+        "matplotlib",
+        "numpy",
+    ],
     entry_points={"console_scripts": ["rethebes = rethebes.__main__:main"]},
     zip_safe=False,
 )
