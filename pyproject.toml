@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rethebes"
+dynamic = ["version"]
+description = "Repeatable thermal benchmarks"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Giulio Foletto", email = "giulio.foletto@outlook.com" },
+]
+dependencies = [
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "psutil",
+    "pyhardwaremonitor @ git+https://github.com/snip3rnick/PyHardwareMonitor.git",
+    "pyzmq",
+]
+
+[tool.hatch.metadata] # For direct dependency of pyhardwaremonitor
+allow-direct-references = true
+
+[project.scripts]
+rethebes = "rethebes.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/giuliofoletto/rethebes"
+
+[tool.hatch.version]
+path = "rethebes/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/rethebes",
+]
