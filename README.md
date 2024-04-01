@@ -3,12 +3,29 @@
 Repeatable thermal benchmarks.
 `rethebes` is a command-line utility that runs a repeatable benchmark of the CPU temperature under user-configurable load conditions.
 
+## Motivation
+
+It is often difficult to test the temperature of your hardware in a scientific and repeatable way.
+Some programs measure the temperature, some stress-test the CPU, some even allow both, but require manual operation.
+
+With `rethebes`, you can configure your stress-test and then run it from the command line.
+Since running the test requires no user action besides launching a command, the test results are more consistent than those obtained by manually running a stress test and a temperature logger at the same time.
+
+## Features
+
+Some notable features of `rethebes` are:
+
+-   Granular control of the CPU load, per physical core.
+-   All the measurements offered by [`LibreHardwareMonitorLib`](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor), such as temperature, load, power, frequency.
+-   Data saved in `.csv` format like that used by `LibreHardwareMonitor`.
+-   Visualization of measurement results after the test.
+
 ## Requirements and installation
 
 `rethebes` has only been tested on Windows 10 and python 3.8.
 It should also be compatible with more recent Windows and python versions.
 
-Internally, `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for [`LibreHardwareMonitorLib`](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor).
+Internally, `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`.
 This requires Windows and .NET Framework 4.7 (that is commonly installed in Windows).
 There is no need to install `PyHardwareMonitor` or `LibreHardwareMonitorLib` manually, as they are installed automatically with `rethebes`, together with all the other python dependencies.
 
@@ -60,4 +77,4 @@ will work if file `~/.rethebes/output/foobar.csv` exists.
 
 The package that loads the CPU uses [code](https://github.com/GaetanoCarlucci/CPULoadGenerator/) by Gaetano Carlucci and Giuseppe Cofano (MIT licensed).
 In addition to `LibreHardwareMonitorLib` (MPL licensed), the code depends on other open source python packages that are downloaded automatically during installation.
-See [setup.py](setup.py) for the list.
+See [pyproject.toml](pyproject.toml) for the list.
