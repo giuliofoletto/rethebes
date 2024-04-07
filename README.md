@@ -20,19 +20,34 @@ Some notable features of `rethebes` are:
 -   Data saved in `.csv` format like that used by `LibreHardwareMonitor`.
 -   Visualization of measurement results after the test.
 
-## Requirements and installation
+## Requirements
 
-`rethebes` has only been tested on Windows 10 and python 3.8.
-It should also be compatible with more recent Windows and python versions.
+`rethebes` should work on Windows 10+ and python 3.8+.
+It also requires [.NET Framework 4.7](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net47) to be installed (this is commonly true on Windows).
+All the other dependencies are automatically installed during the installation of `rethebes`.
+Note that `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`, which is downloaded automatically from github.
 
-Internally, `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`.
-This requires Windows and .NET Framework 4.7 (that is commonly installed in Windows).
-There is no need to install `PyHardwareMonitor` or `LibreHardwareMonitorLib` manually, as they are installed automatically with `rethebes`, together with all the other python dependencies.
+## Installation
 
-Then, you can install `rethebes` from github via `pip` or (recommended) [`pipx`](https://github.com/pypa/pipx):
+You can install `rethebes` from github via `pip` or (recommended) [`pipx`](https://github.com/pypa/pipx):
 
 ```
 pipx install git+https://github.com/giuliofoletto/rethebes
+```
+
+## Removal
+
+If you want to uninstall `rethebes`, you can do so by running
+
+```
+pipx uninstall rethebes
+```
+
+Note that unless you specify otherwise in the configuration file, running `rethebes` creates the folder `~/.rethebes`, which is not deleted by `pipx` when you uninstall `rethebes`.
+You can delete it manually with
+
+```
+rm ~/.rethebes -r -Force
 ```
 
 ## Usage
@@ -45,8 +60,6 @@ rethebes run <config-file>
 
 where `<config-file>` is the path of a configuration file.
 See [examples/README.md](examples/README.md) for a guide about configuration files, and pre-made examples.
-
-Note that unless you specify otherwise in the configuration file, running `rethebes` creates the folder `~/.rethebes`, which is not deleted by `pipx` during if you uninstall `rethebes`.
 
 Assuming your configuration file instructed `rethebes` to save the measurements results, you can visualize them with
 

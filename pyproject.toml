@@ -16,7 +16,7 @@ dependencies = [
     "numpy",
     "pandas",
     "psutil",
-    "pyhardwaremonitor @ git+https://github.com/snip3rnick/PyHardwareMonitor.git",
+    "pyhardwaremonitor @ git+https://github.com/snip3rnick/PyHardwareMonitor.git@f30d9e3b08c4111397cd38af533d98bb28a5414f",
     "pyzmq",
 ]
 
