@@ -10,7 +10,7 @@ import json
 import logging
 import os
 
-from rethebes.analysis import analysis
+from rethebes.analysis import analysis, compare
 from rethebes.main import (
     default_configuration,
     get_default_config_directory,
@@ -24,10 +24,9 @@ def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", type=str, help="Mode of operation [run|analyze]")
     parser.add_argument(
-        "file",
+        "files",
         type=str,
-        nargs="?",
-        default="",
+        nargs="*",
         help="Configuration file for run or data file for analyze",
     )
     args = parser.parse_args()
@@ -37,13 +36,13 @@ def cli():
     configure_logging()
 
     if args.mode == "run":
-        if args.file == "":
+        if len(args.files) == 0:
             configuration = default_configuration
-        else:
+        elif len(args.files) == 1:
             candidates = [
-                os.path.normpath(args.file),
-                os.path.join(get_default_config_directory(), args.file),
-                os.path.join(get_default_config_directory(), args.file + ".json"),
+                os.path.normpath(args.files[0]),
+                os.path.join(get_default_config_directory(), args.files[0]),
+                os.path.join(get_default_config_directory(), args.files[0] + ".json"),
             ]
             config_found = False
             for path in candidates:
@@ -57,12 +56,21 @@ def cli():
             if not config_found:
                 logging.critical("Config file not found")
                 return
+        else:
+            logging.critical("Run mode currently supports only one configuration file")
+            return
         main(configuration)
     elif args.mode == "analyze":
+        if len(args.files) == 0:
+            logging.critical("No file to analyze")
+            return
+        elif len(args.files) > 1:
+            logging.critical("Analyze mode currently supports only one file")
+            return
         candidates = [
-            os.path.normpath(args.file),
-            os.path.join(get_default_output_directory(), args.file),
-            os.path.join(get_default_output_directory(), args.file + ".csv"),
+            os.path.normpath(args.files[0]),
+            os.path.join(get_default_output_directory(), args.files[0]),
+            os.path.join(get_default_output_directory(), args.files[0] + ".csv"),
         ]
         analysis_file_found = False
         for path in candidates:
@@ -73,6 +81,30 @@ def cli():
             logging.critical("File to analyze not found")
             return
         analysis(path)
+    elif args.mode == "compare":
+        if len(args.files) == 0:
+            logging.critical("No files to compare")
+            return
+        elif len(args.files) == 1:
+            logging.critical("Compare mode requires at least two files")
+            return
+        files = []
+        for file in args.files:
+            candidates = [
+                os.path.normpath(file),
+                os.path.join(get_default_output_directory(), file),
+                os.path.join(get_default_output_directory(), file + ".csv"),
+            ]
+            analysis_file_found = False
+            for path in candidates:
+                if os.path.exists(path):
+                    analysis_file_found = True
+                    files.append(path)
+                    break
+            if not analysis_file_found:
+                logging.critical("File to analyze not found")
+                return
+        compare(files)
 
 
 if __name__ == "__main__":
