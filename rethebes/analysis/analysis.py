@@ -165,6 +165,22 @@ def plot_temp_vs_load(data, axis):
     axis.autoscale(tight=True)
 
 
+def plot_temp_vs_power(data, axis):
+    delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
+    window = int(10 / delta_t)
+    axis.plot(
+        data["Power CPU Cores"].rolling(window).mean(),
+        data["Temperature Core Average"].rolling(window).mean(),
+        color="g",
+        marker=".",
+        linestyle="none",
+    )
+    axis.set_xlabel("Power CPU Cores [W]")
+    axis.set_ylabel("Temperature [°C]")
+    axis.grid()
+    axis.autoscale(tight=True)
+
+
 def plot_time_load_temp(data, axis):
     delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
     window = int(10 / delta_t)
@@ -261,11 +277,14 @@ def all_plots(data):
     fig.tight_layout()
 
     fig2 = plt.figure()
-    ax_time_load_temp = fig2.add_subplot(121)
+    ax_time_load_temp = fig2.add_subplot(131)
     plot_time_load_temp(data, ax_time_load_temp)
 
-    ax_temp_vs_load = fig2.add_subplot(122)
+    ax_temp_vs_load = fig2.add_subplot(132)
     plot_temp_vs_load(data, ax_temp_vs_load)
+
+    ax_temp_vs_power = fig2.add_subplot(133)
+    plot_temp_vs_power(data, ax_temp_vs_power)
 
     fig2.autofmt_xdate()
     fig2.tight_layout()
