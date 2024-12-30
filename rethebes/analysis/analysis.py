@@ -168,16 +168,18 @@ def plot_temp_vs_load(data, axis):
 def plot_temp_vs_power(data, axis):
     delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
     window = int(10 / delta_t)
-    axis.plot(
-        data["Power CPU Cores"].rolling(window).mean(),
-        data["Temperature Core Average"].rolling(window).mean(),
-        color="g",
-        marker=".",
-        linestyle="none",
-    )
+    x = data["Power CPU Cores"].rolling(window).mean()
+    y = data["Temperature Core Average"].rolling(window).mean()
+    valid = ~(np.isnan(x) | np.isnan(y))
+    (m, q) = np.polyfit(x[valid], y[valid], 1)
+    txt = f"m = {m:.2f} K/W\nq = {q:.2f} °C"
+    axis.text(0.05, 0.95, txt, transform=axis.transAxes, fontsize=8)
+    axis.plot(x, y, color="g", marker=".", linestyle="none", label="Avg")
+    axis.plot(x, m * x + q, color="k", label="Fit")
     axis.set_xlabel("Power CPU Cores [W]")
     axis.set_ylabel("Temperature [°C]")
     axis.grid()
+    axis.legend(loc="lower right")
     axis.autoscale(tight=True)
 
 
