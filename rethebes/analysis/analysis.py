@@ -170,11 +170,16 @@ def plot_temp_vs_power(data, axis):
     window = int(10 / delta_t)
     x = data["Power CPU Cores"].rolling(window).mean()
     y = data["Temperature Core Average"].rolling(window).mean()
+    sigmay = data["Temperature Core Average"].rolling(window).std()
+    amax = y.argmax()
+    amin = y.argmin()
     valid = ~(np.isnan(x) | np.isnan(y))
-    (m, q) = np.polyfit(x[valid], y[valid], 1)
-    txt = f"m = {m:.2f} K/W\nq = {q:.2f} °C"
-    axis.text(0.05, 0.95, txt, transform=axis.transAxes, fontsize=8)
-    axis.plot(x, y, color="g", marker=".", linestyle="none", label="Avg")
+    (m, q), cov = np.polyfit(x[valid], y[valid], 1, w=1 / sigmay[valid], cov="unscaled")
+    txt = f"m = {m:.2f} +- {cov[0,0]:.2f} K/W\nq = {q:.2f} +- {cov[1, 1]:.2f} °C\ntmax = {y[amax]:.2f} +- {sigmay[amax]:.2f} °C\ntmin = {y[amin]:.2f} +- {sigmay[amin]:.2f} °C"
+    axis.text(
+        0.05, 0.95, txt, transform=axis.transAxes, fontsize=8, ha="left", va="top"
+    )
+    axis.plot(x[valid], y[valid], color="g", marker=".", linestyle="none", label="Avg")
     axis.plot(x, m * x + q, color="k", label="Fit")
     axis.set_xlabel("Power CPU Cores [W]")
     axis.set_ylabel("Temperature [°C]")
