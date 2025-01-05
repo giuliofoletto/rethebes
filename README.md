@@ -25,7 +25,7 @@ Some notable features of `rethebes` are:
 `rethebes` should work on Windows 10+ and python 3.8+.
 It also requires [.NET Framework 4.7](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net47) to be installed (this is commonly true on Windows).
 All the other dependencies are automatically installed during the installation of `rethebes`.
-Note that `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`, which is downloaded automatically from github.
+Note that `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`, which is downloaded automatically from pypi.
 
 ## Installation
 
