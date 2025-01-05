@@ -22,7 +22,9 @@ from rethebes.util import configure_logging
 
 def cli():
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", type=str, help="Mode of operation [run|analyze]")
+    parser.add_argument(
+        "mode", type=str, help="Mode of operation [run|analyze|compare]"
+    )
     parser.add_argument(
         "files",
         type=str,
@@ -65,7 +67,9 @@ def cli():
             logging.critical("No file to analyze")
             return
         elif len(args.files) > 1:
-            logging.critical("Analyze mode currently supports only one file")
+            logging.critical(
+                "Analyze mode currently supports only one file. Use compare mode for multiple files"
+            )
             return
         candidates = [
             os.path.normpath(args.files[0]),
@@ -78,7 +82,7 @@ def cli():
                 analysis_file_found = True
                 break
         if not analysis_file_found:
-            logging.critical("File to analyze not found")
+            logging.critical("File to analyze " + args.files[0] + " not found")
             return
         analysis(path)
     elif args.mode == "compare":
@@ -86,7 +90,9 @@ def cli():
             logging.critical("No files to compare")
             return
         elif len(args.files) == 1:
-            logging.critical("Compare mode requires at least two files")
+            logging.critical(
+                "Compare mode requires at least two files. Use analyze mode for one file"
+            )
             return
         files = []
         for file in args.files:
@@ -102,9 +108,11 @@ def cli():
                     files.append(path)
                     break
             if not analysis_file_found:
-                logging.critical("File to analyze not found")
+                logging.critical("File to compare " + file + " not found")
                 return
         compare(files)
+    else:
+        logging.critical("Invalid mode. Supported modes: run, analyze, compare")
 
 
 if __name__ == "__main__":

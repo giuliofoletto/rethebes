@@ -9,6 +9,8 @@ import logging
 
 from .util import *
 
+window_in_seconds = 5
+
 
 def plot_frequency(data, axis):
     num_cores = get_number_of_cores(data)
@@ -81,13 +83,13 @@ def plot_voltage(data, axis):
             data["Voltage CPU Core #" + str(i + 1)],
             label="C" + str(i + 1),
         )
-    axis.set_ylabel("Voltage [W]")
+    axis.set_ylabel("Voltage [V]")
     format_standard_axis(data, axis)
 
 
 def plot_temp_vs_load(data, axis):
     delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
-    window = int(10 / delta_t)
+    window = int(window_in_seconds / delta_t)
     axis.plot(
         data["Load CPU Total"].rolling(window).mean(),
         data["Temperature Core Average"].rolling(window).mean(),
@@ -113,7 +115,7 @@ def plot_temp_vs_load(data, axis):
 
 def plot_temp_vs_power(data, axis):
     delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
-    window = int(10 / delta_t)
+    window = int(window_in_seconds / delta_t)
     x = data["Power CPU Cores"].rolling(window).mean()
     y = data["Temperature Core Average"].rolling(window).mean()
     sigmay = data["Temperature Core Average"].rolling(window).std()
@@ -136,7 +138,7 @@ def plot_temp_vs_power(data, axis):
 
 def plot_time_load_temp(data, axis):
     delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
-    window = int(10 / delta_t)
+    window = int(window_in_seconds / delta_t)
     axis.plot(
         data["Time"],
         data["Load CPU Total"].rolling(window).mean(),

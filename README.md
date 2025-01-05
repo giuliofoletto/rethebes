@@ -67,6 +67,12 @@ Assuming your configuration file instructed `rethebes` to save the measurements 
 rethebes analyze <output-file>
 ```
 
+You can also view a simple comparison of multiple files with
+
+```
+rethebes compare <output-file-1> <output-file-2> ...
+```
+
 ## Tricks
 
 For convenience, if you place your configuration file in the default folder (`~/.rethebes/config/`), you can invoke it via name only, without necessarily including the full path or the extension.
