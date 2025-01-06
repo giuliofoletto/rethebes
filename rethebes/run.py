@@ -6,12 +6,12 @@ License: See project-level license file.
 """
 
 import datetime
-from pathlib import Path
 
 import zmq
 
 from rethebes.analysis import analysis
 from rethebes.instruments import Loader, Manager, Sensor, Timer
+from rethebes.util import get_default_output_directory
 
 known_instruments = {"loader": Loader, "sensor": Sensor, "timer": Timer}
 
@@ -88,30 +88,6 @@ def process_configuration(configuration):
             get_default_output_directory() / file_name
         )
     return configuration
-
-
-def get_default_global_directory(create=False):
-    user_dir = Path.home()
-    rethebes_dir = user_dir / ".rethebes"
-    if create and not rethebes_dir.exists():
-        rethebes_dir.mkdir()
-    return rethebes_dir
-
-
-def get_default_output_directory(create=False):
-    rethebes_dir = get_default_global_directory()
-    output_dir = rethebes_dir / "output"
-    if create and not output_dir.exists():
-        output_dir.mkdir()
-    return output_dir
-
-
-def get_default_config_directory(create=False):
-    rethebes_dir = get_default_global_directory()
-    config_dir = rethebes_dir / "config"
-    if create and not config_dir.exists():
-        config_dir.mkdir()
-    return config_dir
 
 
 def run(configuration):

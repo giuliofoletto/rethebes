@@ -11,14 +11,11 @@ from pathlib import Path
 
 import click
 
-from rethebes.analysis import analysis, compare
-from rethebes.run import (
-    default_configuration,
+from rethebes.util import (
+    configure_logging,
     get_default_config_directory,
     get_default_output_directory,
-    run,
 )
-from rethebes.util import configure_logging
 
 
 @click.group()
@@ -30,6 +27,8 @@ def cli():
 @click.argument("config_file", type=click.Path(), required=False)
 def run_command(config_file):
     """Run measurement according to CONFIG_FILE."""
+    from rethebes.run import default_configuration, run
+
     if config_file is None:
         configuration = default_configuration
     else:
@@ -57,6 +56,8 @@ def run_command(config_file):
 @click.argument("data_file", type=click.Path())
 def analyze_command(data_file):
     """Analyze DATA_FILE."""
+    from rethebes.analysis import analysis
+
     candidates = [
         Path(data_file).resolve(),
         get_default_output_directory() / data_file,
@@ -77,6 +78,8 @@ def analyze_command(data_file):
 @click.argument("data_files", type=click.Path(), nargs=-1)
 def compare_command(data_files):
     """Compare DATA_FILES."""
+    from rethebes.analysis import compare
+
     if len(data_files) == 0:
         logging.critical("No files to compare")
         return
