@@ -11,11 +11,11 @@ import logging
 from pathlib import Path
 
 from rethebes.analysis import analysis, compare
-from rethebes.main import (
+from rethebes.run import (
     default_configuration,
     get_default_config_directory,
     get_default_output_directory,
-    main,
+    run,
 )
 from rethebes.util import configure_logging
 
@@ -61,7 +61,7 @@ def cli():
         else:
             logging.critical("Run mode currently supports only one configuration file")
             return
-        main(configuration)
+        run(configuration)
     elif args.mode == "analyze":
         if len(args.files) == 0:
             logging.critical("No file to analyze")

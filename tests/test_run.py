@@ -1,5 +1,5 @@
 """
-Main test facility.
+Test facility for run mode.
 
 Authors: Giulio Foletto.
 License: See project-level license file.
@@ -11,10 +11,10 @@ from pathlib import Path
 
 import pytest
 
-from rethebes.main import default_configuration, main, process_configuration
+from rethebes.run import default_configuration, process_configuration, run
 
 
-# Tests of main logic
+# Tests of running logic
 def test_typical():
     configuration = {
         "instruments": ["loader", "sensor"],
@@ -32,7 +32,7 @@ def test_typical():
             "write": False,
         },
     }
-    main(configuration)
+    run(configuration)
     # No assert since we are only testing for exceptions here
 
 
@@ -48,7 +48,7 @@ def test_cannot_read_temperature_critical(caplog):
         },
     }
     caplog.set_level(logging.CRITICAL)
-    main(configuration)
+    run(configuration)
     assert "Could not read temperature" in caplog.text
 
 
@@ -63,7 +63,7 @@ def test_time():
         "timer": {"duration": 1},
     }
     start = time.time()
-    main(configuration)
+    run(configuration)
     stop = time.time()
     assert (
         stop - start < configuration["timer"]["duration"] + 3
@@ -81,7 +81,7 @@ def test_write():
         },
         "timer": {"duration": 1},
     }
-    main(configuration)
+    run(configuration)
     path = Path.cwd() / configuration["sensor"]["file_name"]
     assert path.exists()
     path.unlink()  # Clean up

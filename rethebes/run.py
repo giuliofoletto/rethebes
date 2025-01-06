@@ -114,7 +114,7 @@ def get_default_config_directory(create=False):
     return config_dir
 
 
-def main(configuration):
+def run(configuration):
     configuration = process_configuration(configuration)
     context = zmq.Context(0)
     instruments = [
