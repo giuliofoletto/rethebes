@@ -12,6 +12,7 @@ authors = [
     { name = "Giulio Foletto", email = "giulio.foletto@outlook.com" },
 ]
 dependencies = [
+    "click",
     "matplotlib",
     "numpy",
     "pandas",
