@@ -6,7 +6,7 @@ License: See project-level license file.
 """
 
 import logging
-import os
+from pathlib import Path
 
 from .util import *
 
@@ -50,12 +50,8 @@ def all_plots(file_names, data_list):
     ax_temp_vs_load = fig.add_subplot(121)
     ax_temp_vs_power = fig.add_subplot(122)
     for name, data in zip(file_names, data_list):
-        plot_temp_vs_load(
-            data, ax_temp_vs_load, os.path.splitext(os.path.basename(name))[0]
-        )
-        plot_temp_vs_power(
-            data, ax_temp_vs_power, os.path.splitext(os.path.basename(name))[0]
-        )
+        plot_temp_vs_load(data, ax_temp_vs_load, Path(name).stem)
+        plot_temp_vs_power(data, ax_temp_vs_power, Path(name).stem)
     format_base_axis(ax_temp_vs_load)
     format_base_axis(ax_temp_vs_power)
     fig.tight_layout()

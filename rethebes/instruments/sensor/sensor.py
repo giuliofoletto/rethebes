@@ -8,8 +8,8 @@ License: See project-level license file.
 import csv
 import datetime
 import logging
-import os
 import time
+from pathlib import Path
 
 from HardwareMonitor import Hardware
 
@@ -26,7 +26,7 @@ class Sensor(Instrument):
     def open(self):
         self.sampling_interval = self.configuration["sampling_interval"]
         self.should_write = self.configuration["write"]
-        self.path = os.path.normpath(self.configuration["file_name"])
+        self.path = Path(self.configuration["file_name"]).resolve()
 
         self.pc = Hardware.Computer()
         self.pc.IsCpuEnabled = True
@@ -51,17 +51,17 @@ class Sensor(Instrument):
                 return
 
         if self.should_write:
-            directory = os.path.abspath(os.path.dirname(self.path))
-            if not os.path.exists(directory):
-                os.makedirs(directory)
+            directory = self.path.parent.resolve()
+            if not directory.exists():
+                directory.mkdir(parents=True)
                 logging.info("Created directory " + directory)
             self.file = open(self.configuration["file_name"], "w", newline="")
             self.writer = csv.writer(self.file, delimiter=",")
             self.header_written = False
 
     def close(self):
-        if self.should_write and os.path.exists(self.path):
-            logging.info("Sensor data saved correctly in " + self.path)
+        if self.should_write and self.path.exists():
+            logging.info("Sensor data saved correctly in " + str(self.path))
             self.file.close()
 
     def run(self):

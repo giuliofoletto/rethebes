@@ -6,7 +6,7 @@ License: See project-level license file.
 """
 
 import datetime
-import os
+from pathlib import Path
 
 import zmq
 
@@ -84,33 +84,33 @@ def process_configuration(configuration):
             .replace(":", "-")
             + ".csv"
         )
-        configuration["sensor"]["file_name"] = os.path.join(
-            get_default_output_directory(), file_name
+        configuration["sensor"]["file_name"] = (
+            get_default_output_directory() / file_name
         )
     return configuration
 
 
 def get_default_global_directory(create=False):
-    user_dir = os.path.expanduser("~")
-    rethebes_dir = os.path.join(user_dir, ".rethebes")
-    if create and not os.path.exists(rethebes_dir):
-        os.makedirs(rethebes_dir)
+    user_dir = Path.home()
+    rethebes_dir = user_dir / ".rethebes"
+    if create and not rethebes_dir.exists():
+        rethebes_dir.mkdir()
     return rethebes_dir
 
 
 def get_default_output_directory(create=False):
     rethebes_dir = get_default_global_directory()
-    output_dir = os.path.join(rethebes_dir, "output")
-    if create and not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    output_dir = rethebes_dir / "output"
+    if create and not output_dir.exists():
+        output_dir.mkdir()
     return output_dir
 
 
 def get_default_config_directory(create=False):
     rethebes_dir = get_default_global_directory()
-    config_dir = os.path.join(rethebes_dir, "config")
-    if create and not os.path.exists(config_dir):
-        os.makedirs(config_dir)
+    config_dir = rethebes_dir / "config"
+    if create and not config_dir.exists():
+        config_dir.mkdir()
     return config_dir
 
 

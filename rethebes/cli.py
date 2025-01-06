@@ -8,7 +8,7 @@ License: See project-level license file.
 import argparse
 import json
 import logging
-import os
+from pathlib import Path
 
 from rethebes.analysis import analysis, compare
 from rethebes.main import (
@@ -42,9 +42,9 @@ def cli():
             configuration = default_configuration
         elif len(args.files) == 1:
             candidates = [
-                os.path.normpath(args.files[0]),
-                os.path.join(get_default_config_directory(), args.files[0]),
-                os.path.join(get_default_config_directory(), args.files[0] + ".json"),
+                Path(args.files[0]).resolve(),
+                get_default_config_directory() / args.files[0],
+                get_default_config_directory() / (args.files[0] + ".json"),
             ]
             config_found = False
             for path in candidates:
@@ -72,13 +72,13 @@ def cli():
             )
             return
         candidates = [
-            os.path.normpath(args.files[0]),
-            os.path.join(get_default_output_directory(), args.files[0]),
-            os.path.join(get_default_output_directory(), args.files[0] + ".csv"),
+            Path(args.files[0]).resolve(),
+            get_default_output_directory() / args.files[0],
+            get_default_output_directory() / (args.files[0] + ".csv"),
         ]
         analysis_file_found = False
         for path in candidates:
-            if os.path.exists(path):
+            if path.exists():
                 analysis_file_found = True
                 break
         if not analysis_file_found:
@@ -97,13 +97,13 @@ def cli():
         files = []
         for file in args.files:
             candidates = [
-                os.path.normpath(file),
-                os.path.join(get_default_output_directory(), file),
-                os.path.join(get_default_output_directory(), file + ".csv"),
+                Path(file).resolve(),
+                get_default_output_directory() / file,
+                get_default_output_directory() / (file + ".csv"),
             ]
             analysis_file_found = False
             for path in candidates:
-                if os.path.exists(path):
+                if path.exists():
                     analysis_file_found = True
                     files.append(path)
                     break

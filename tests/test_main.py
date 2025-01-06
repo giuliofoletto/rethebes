@@ -6,8 +6,8 @@ License: See project-level license file.
 """
 
 import logging
-import os
 import time
+from pathlib import Path
 
 import pytest
 
@@ -82,9 +82,9 @@ def test_write():
         "timer": {"duration": 1},
     }
     main(configuration)
-    path = os.path.join("./", configuration["sensor"]["file_name"])
-    assert os.path.exists(path)
-    os.remove(path)
+    path = Path.cwd() / configuration["sensor"]["file_name"]
+    assert path.exists()
+    path.unlink()  # Clean up
 
 
 def test_process_configuration():
