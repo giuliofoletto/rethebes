@@ -87,7 +87,35 @@ def plot_voltage(data, axis):
     format_standard_axis(data, axis)
 
 
+def analyze_temp_vs_load(data):
+    delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
+    window = int(window_in_seconds / delta_t)
+    x = data["Load CPU Total"].rolling(window).mean()
+    y = data["Temperature Core Average"].rolling(window).mean()
+    # Use range rather than percentiles because non-uniform distributions are more likely than outliers
+    l95 = x.min() + 0.95 * (x.max() - x.min())
+    l05 = x.min() + 0.05 * (x.max() - x.min())
+    t_for_l95 = y[x > l95].mean()
+    t_for_l05 = y[x < l05].mean()
+    std_t_for_l95 = y[x > l95].std()
+    std_t_for_l05 = y[x < l05].std()
+    result = dict(
+        l95=l95,
+        l05=l05,
+        t_for_l95=t_for_l95,
+        std_t_for_l95=std_t_for_l95,
+        t_for_l05=t_for_l05,
+        std_t_for_l05=std_t_for_l05,
+    )
+    return result
+
+
 def plot_temp_vs_load(data, axis):
+    analysis_result = analyze_temp_vs_load(data)
+    txt = f"T for L95 = {analysis_result["t_for_l95"]:.2f} +- {analysis_result["std_t_for_l95"]:.2f} °C\nT for L05 = {analysis_result["t_for_l05"]:.2f} +- {analysis_result["std_t_for_l05"]:.2f} °C"
+    axis.text(
+        0.05, 0.95, txt, transform=axis.transAxes, fontsize=8, ha="left", va="top"
+    )
     delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
     window = int(window_in_seconds / delta_t)
     axis.plot(
@@ -109,26 +137,67 @@ def plot_temp_vs_load(data, axis):
     axis.set_xlabel("Load CPU Total [%]")
     axis.set_ylabel("Temperature [°C]")
     axis.grid()
-    axis.legend()
+    axis.legend(loc="lower right")
     axis.autoscale(tight=True)
 
 
-def plot_temp_vs_power(data, axis):
+def analyze_temp_vs_power(data):
     delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
     window = int(window_in_seconds / delta_t)
     x = data["Power CPU Cores"].rolling(window).mean()
     y = data["Temperature Core Average"].rolling(window).mean()
     sigmay = data["Temperature Core Average"].rolling(window).std()
-    amax = y.argmax()
-    amin = y.argmin()
+    # Use range rather than percentiles because non-uniform distributions are more likely than outliers
+    p95 = x.min() + 0.95 * (x.max() - x.min())
+    p05 = x.min() + 0.05 * (x.max() - x.min())
+    t_for_p95 = y[x > p95].mean()
+    t_for_p05 = y[x < p05].mean()
+    std_t_for_p95 = y[x > p95].std()
+    std_t_for_p05 = y[x < p05].std()
     valid = ~(np.isnan(x) | np.isnan(y))
     (m, q), cov = np.polyfit(x[valid], y[valid], 1, w=1 / sigmay[valid], cov="unscaled")
-    txt = f"m = {m:.2f} +- {cov[0,0]:.2f} K/W\nq = {q:.2f} +- {cov[1, 1]:.2f} °C\ntmax = {y[amax]:.2f} +- {sigmay[amax]:.2f} °C\ntmin = {y[amin]:.2f} +- {sigmay[amin]:.2f} °C"
+    c = 1 / m
+    sigma_c = c**2 * np.sqrt(cov[0, 0])
+    result = dict(
+        p95=p95,
+        p05=p05,
+        m=m,
+        sigma_m=np.sqrt(cov[0, 0]),
+        q=q,
+        sigma_q=np.sqrt(cov[1, 1]),
+        c=c,
+        sigma_c=sigma_c,
+        t_for_p95=t_for_p95,
+        std_t_for_p95=std_t_for_p95,
+        t_for_p05=t_for_p05,
+        std_t_for_p05=std_t_for_p05,
+    )
+    return result
+
+
+def plot_temp_vs_power(data, axis):
+    analysis_result = analyze_temp_vs_power(data)
+    txt = f"C = {analysis_result["c"]:.2f} +- {analysis_result["sigma_c"]:.2f} W/K\nT for P95 = {analysis_result["t_for_p95"]:.2f} +- {analysis_result["std_t_for_p95"]:.2f} °C\nT for P05 = {analysis_result["t_for_p05"]:.2f} +- {analysis_result["std_t_for_p05"]:.2f} °C"
     axis.text(
         0.05, 0.95, txt, transform=axis.transAxes, fontsize=8, ha="left", va="top"
     )
-    axis.plot(x[valid], y[valid], color="g", marker=".", linestyle="none", label="Avg")
-    axis.plot(x, m * x + q, color="k", label="Fit")
+    delta_t = data["Time"].diff().mean() / np.timedelta64(1, "s")
+    window = int(window_in_seconds / delta_t)
+    axis.plot(
+        data["Power CPU Cores"].rolling(window).mean(),
+        data["Temperature Core Average"].rolling(window).mean(),
+        color="g",
+        marker=".",
+        linestyle="none",
+        label="Avg",
+    )
+    axis.plot(
+        data["Power CPU Cores"].rolling(window).mean(),
+        analysis_result["m"] * data["Power CPU Cores"].rolling(window).mean()
+        + analysis_result["q"],
+        color="k",
+        label="Fit",
+    )
     axis.set_xlabel("Power CPU Cores [W]")
     axis.set_ylabel("Temperature [°C]")
     axis.grid()
