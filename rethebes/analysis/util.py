@@ -127,3 +127,31 @@ def analyze_temp_vs_power(data):
         std_t_for_p05=std_t_for_p05,
     )
     return result
+
+
+def hex_string_from_rgba(r, g, b, a):
+    """
+    Get a formatted hex string from RGBA values.
+
+    Parameters
+    ----------
+    r: float
+        Red color channel in [0, 1].
+    g: float
+        Green color channel in [0, 1].
+    b: float
+        Blue color channel in [0, 1].
+    a: float
+        Alpha color channel in [0, 1].
+
+    Returns
+    -------
+    str
+        Formatted hex string starting with # and then 8 hex characters (4 bytes).
+    """
+    # Convert float values in [0, 1] to hex strings of two characters, e.g. 1->ff
+    r_hex = f"{int(r*255):02x}"
+    g_hex = f"{int(g*255):02x}"
+    b_hex = f"{int(b*255):02x}"
+    a_hex = f"{int(a*255):02x}"
+    return "#" + r_hex + g_hex + b_hex + a_hex
