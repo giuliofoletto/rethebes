@@ -77,6 +77,15 @@ def analyze_temp_vs_load(data):
     window = int(window_in_seconds / delta_t)
     x = data["Load CPU Total"].rolling(window).mean()
     y = data["Temperature Core Average"].rolling(window).mean()
+    if len(x[x.notna()]) < 2 or len(y[y.notna()]) < 2:
+        return dict(
+            l95=np.nan,
+            l05=np.nan,
+            t_for_l95=np.nan,
+            std_t_for_l95=np.nan,
+            t_for_l05=np.nan,
+            std_t_for_l05=np.nan,
+        )
     # Use range rather than percentiles because non-uniform distributions are more likely than outliers
     l95 = x.min() + 0.95 * (x.max() - x.min())
     l05 = x.min() + 0.05 * (x.max() - x.min())
@@ -108,23 +117,33 @@ def analyze_temp_vs_power(data):
     t_for_p05 = y[x < p05].mean()
     std_t_for_p95 = y[x > p95].std()
     std_t_for_p05 = y[x < p05].std()
-    valid = ~(np.isnan(x) | np.isnan(y))
-    (m, q), cov = np.polyfit(x[valid], y[valid], 1, w=1 / sigmay[valid], cov="unscaled")
-    c = 1 / m
-    sigma_c = c**2 * np.sqrt(cov[0, 0])
     result = dict(
         p95=p95,
         p05=p05,
-        m=m,
-        sigma_m=np.sqrt(cov[0, 0]),
-        q=q,
-        sigma_q=np.sqrt(cov[1, 1]),
-        c=c,
-        sigma_c=sigma_c,
         t_for_p95=t_for_p95,
         std_t_for_p95=std_t_for_p95,
         t_for_p05=t_for_p05,
         std_t_for_p05=std_t_for_p05,
+    )
+    valid = x.notna() & y.notna()
+    if len(x[valid]) < 2 or len(y[valid]) < 2:
+        result.update(
+            m=np.nan,
+            sigma_m=np.nan,
+            q=np.nan,
+            sigma_q=np.nan,
+            c=np.nan,
+            sigma_c=np.nan,
+        )
+        return result
+    (m, q), cov = np.polyfit(x[valid], y[valid], 1, w=1 / sigmay[valid], cov="unscaled")
+    result.update(
+        m=m,
+        sigma_m=np.sqrt(cov[0, 0]),
+        q=q,
+        sigma_q=np.sqrt(cov[1, 1]),
+        c=1 / m,
+        sigma_c=1 / m**2 * np.sqrt(cov[0, 0]),
     )
     return result
 

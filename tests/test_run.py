@@ -39,6 +39,7 @@ def test_typical():
 def test_cannot_read_temperature_critical(caplog):
     # Note: This test succeeds if there is a critical error in reading the temperature
     # This happens if the test is run without admin privileges
+    # This means that this test should be run without admin privileges (otherwise there is no error and the test fails)
     configuration = {
         "instruments": ["sensor"],
         "sensor": {

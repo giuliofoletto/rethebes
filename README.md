@@ -92,6 +92,14 @@ rethebes analyze foobar
 
 will work if file `~/.rethebes/output/foobar.csv` exists.
 
+## Development
+
+While developing `rethebes`, it is best to install it in an editable manner so that code changes are instantly available in the executed code without reinstallation:
+
+```
+pip install -e .
+```
+
 ## Attribution
 
 The package that loads the CPU uses [code](https://github.com/GaetanoCarlucci/CPULoadGenerator/) by Gaetano Carlucci and Giuseppe Cofano (MIT licensed).
