@@ -9,7 +9,6 @@ import datetime
 
 import zmq
 
-from rethebes.analysis import analysis
 from rethebes.instruments import Loader, Manager, Sensor, Timer
 from rethebes.util import get_default_output_directory
 
@@ -101,5 +100,3 @@ def run(configuration):
     # This executes everything
     manager.main()
     context.term()
-    if configuration["analyze"] and configuration["sensor"]["write"]:
-        analysis(configuration["sensor"]["file_name"])
