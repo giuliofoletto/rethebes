@@ -12,13 +12,13 @@ authors = [
     { name = "Giulio Foletto", email = "giulio.foletto@outlook.com" },
 ]
 dependencies = [
-    "click",
-    "matplotlib",
-    "numpy",
-    "pandas",
-    "psutil",
-    "hardwaremonitor",
-    "pyzmq",
+    "click~=8.3.0",
+    "matplotlib~=3.10.0",
+    "numpy~=2.3.0",
+    "pandas~=2.3.0",
+    "psutil~=7.1.0",
+    "hardwaremonitor==1.0.0",
+    "pyzmq~=27.1.0",
 ]
 
 [project.scripts]
