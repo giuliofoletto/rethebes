@@ -24,10 +24,11 @@ Some notable features of `rethebes` are:
 
 ## Requirements
 
-`rethebes` should work on Windows 10+ and python 3.8+.
+`rethebes` should work on Windows 10+ and python 3.13.
 It also requires [.NET Framework 4.7](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net47) to be installed (this is commonly true on Windows).
 All the other dependencies are automatically installed during the installation of `rethebes`.
 Note that `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`, which is downloaded automatically from pypi.
+Version dependencies are pinned to guarantee compatibility, therefore it is recommended to install `rethebes` in a virtual environment or via `pipx` (see below).
 
 ## Installation
 
@@ -111,3 +112,4 @@ The `tests` folder contains some tests that should be run in a non-elevated term
 The module that loads the CPU uses [code](https://github.com/GaetanoCarlucci/CPULoadGenerator/) by Gaetano Carlucci and Giuseppe Cofano (MIT licensed).
 In addition to `LibreHardwareMonitorLib` (MPL licensed), the code depends on other open source python packages that are downloaded automatically during installation.
 See [pyproject.toml](pyproject.toml) for the list.
+AI was used only for GitHub action workflows.
