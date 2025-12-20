@@ -28,25 +28,28 @@ Some notable features of `rethebes` are:
 It also requires [.NET Framework 4.7](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net47) to be installed (this is commonly true on Windows).
 All the other dependencies are automatically installed during the installation of `rethebes`.
 Note that `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`, which is downloaded automatically from pypi.
-Version dependencies are pinned to guarantee compatibility, therefore it is recommended to install `rethebes` in a virtual environment or via `pipx` (see below).
+Version dependencies are pinned to guarantee compatibility, therefore it is recommended to install `rethebes` in a virtual environment or via `uv tool` (see below).
 
 ## Installation
 
-You can install `rethebes` from github via `pip` or (recommended) [`pipx`](https://github.com/pypa/pipx):
+You can install `rethebes` from github via [`uv`](https://docs.astral.sh/uv/):
 
 ```
-pipx install git+https://github.com/giuliofoletto/rethebes
+uv venv --python 3.13
+uv tool install --from git+https://github.com/giuliofoletto/rethebes rethebes
 ```
+
+Other installation methods like `pip` or `pipx` are also good, but you will have to install python 3.13 separately.
 
 ## Removal
 
 If you want to uninstall `rethebes`, you can do so with command:
 
 ```
-pipx uninstall rethebes
+uv tool uninstall rethebes
 ```
 
-Note that, unless you specify otherwise in the configuration file, running `rethebes` creates the folder `~/.rethebes`, which is not deleted by `pipx` when you uninstall `rethebes`.
+Note that, unless you specify otherwise in the configuration file, running `rethebes` creates the folder `~/.rethebes`, which is not deleted by `uv` when you uninstall `rethebes`.
 You can delete it manually with
 
 ```
