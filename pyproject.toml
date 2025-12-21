@@ -11,15 +11,14 @@ license = "Apache-2.0"
 authors = [
     { name = "Giulio Foletto", email = "giulio.foletto@outlook.com" },
 ]
-requires-python = "==3.13.*"
 dependencies = [
-    "click~=8.3.0",
-    "matplotlib~=3.10.0",
-    "numpy~=2.3.0",
-    "pandas~=2.3.0",
-    "psutil~=7.1.0",
+    "click",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "psutil",
     "hardwaremonitor==1.0.0",
-    "pyzmq~=27.1.0",
+    "pyzmq",
 ]
 
 [project.scripts]
