@@ -1,6 +1,6 @@
 # rethebes
 
-Repeatable thermal benchmarks.
+Repeatable thermal benchmarks for your CPU.
 
 `rethebes` is a command-line utility that runs a repeatable benchmark of the CPU temperature under user-configurable load conditions.
 
@@ -28,7 +28,7 @@ Some notable features of `rethebes` are:
 It also requires [.NET Framework 4.7](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net47) to be installed (this is commonly true on Windows).
 All the other dependencies are automatically installed during the installation of `rethebes`.
 Note that `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`, which is downloaded automatically from pypi.
-Version dependencies are pinned to guarantee compatibility, therefore it is recommended to install `rethebes` in a virtual environment or via `uv tool` (see below).
+The versions of some dependencies are pinned to guarantee compatibility, therefore it is recommended to install `rethebes` in a virtual environment or via `uv tool` (see below).
 
 ## Installation
 
@@ -38,7 +38,7 @@ You can install `rethebes` from github via [`uv`](https://docs.astral.sh/uv/):
 uv tool install --from git+https://github.com/giuliofoletto/rethebes rethebes
 ```
 
-Other installation methods like `pip` or `pipx` are also good, but you will have to install the right version of python separately.
+Other installation methods like `pip` or `pipx` work too, but you will have to install the right version of python separately.
 
 ## Removal
 
