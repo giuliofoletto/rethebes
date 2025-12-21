@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - develop
+      - uv
 
 jobs:
   install-and-test:
@@ -17,7 +18,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Create uv environment
-        run: uv venv --python 3.13
+        run: uv venv --python ">=3.13,<3.14"
 
       - name: Install package (local)
         run: uv pip install .

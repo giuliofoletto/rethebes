@@ -35,11 +35,10 @@ Version dependencies are pinned to guarantee compatibility, therefore it is reco
 You can install `rethebes` from github via [`uv`](https://docs.astral.sh/uv/):
 
 ```
-uv venv --python 3.13
-uv tool install --from git+https://github.com/giuliofoletto/rethebes rethebes
+uv tool install --python ">=3.13,<3.14" --from git+https://github.com/giuliofoletto/rethebes rethebes
 ```
 
-Other installation methods like `pip` or `pipx` are also good, but you will have to install python 3.13 separately.
+Other installation methods like `pip` or `pipx` are also good, but you will have to install the right version of python separately.
 
 ## Removal
 
