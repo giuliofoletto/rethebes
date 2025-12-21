@@ -94,12 +94,18 @@ def test_analyze_temp_vs_power():
     data = read_data_from_file(file_path)
     results = analyze_temp_vs_power(data)
     expected_results = dict(
-        p95=65.5072463768116,
-        p05=4.328985507246377,
-        t_for_p95=78.99115044247788,
-        std_t_for_p95=1.5670499489647083,
-        t_for_p05=41.25663716814159,
-        std_t_for_p05=2.3441852305561065,
+        p95=74.56014847738875,
+        p05=4.655501124097241,
+        t_for_p95=81.29907365587022,
+        std_t_for_p95=0.8097969318015877,
+        t_for_p05=39.63919428824214,
+        std_t_for_p05=1.3589345627673284,
+        m=0.5675147033877365,
+        sigma_m=0.0008319073896130219,
+        q=38.92118408040697,
+        sigma_q=0.05329613739690532,
+        c=1.7620688839083376,
+        sigma_c=0.002582978232599202,
     )
     for key in expected_results:
         assert results[key] == pytest.approx(expected_results[key], 1e-3)
