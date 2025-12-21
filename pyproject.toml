@@ -11,6 +11,7 @@ license = "Apache-2.0"
 authors = [
     { name = "Giulio Foletto", email = "giulio.foletto@outlook.com" },
 ]
+requires-python = ">= 3.12"
 dependencies = [
     "click",
     "matplotlib",
