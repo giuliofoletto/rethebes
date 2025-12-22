@@ -30,7 +30,17 @@ class Loader(Instrument):
 
     def open(self):
         self.physical_cores = psutil.cpu_count(logical=False)
+        if self.physical_cores is None:
+            logging.error(
+                "Could not determine number of physical CPU cores. Defaulting to 1, but should not happen."
+            )
+            self.physical_cores = 1
         self.logical_cores = psutil.cpu_count(logical=True)
+        if self.logical_cores is None:
+            logging.error(
+                "Could not determine number of logical CPU cores. Defaulting to 1, but should not happen."
+            )
+            self.logical_cores = 1
         self.hyperthreading = self.logical_cores // self.physical_cores
 
     def run(self):
@@ -43,7 +53,9 @@ class Loader(Instrument):
             # Allow loading all cores with "all"
             if load["target_cores"] == "all":
                 load["target_cores"] = []
-                for i in range(self.physical_cores):
+                for i in range(
+                    1 if self.physical_cores is None else self.physical_cores
+                ):
                     load["target_cores"].append(i + 1)
             # Allow setting one core without writing it as a list
             if isinstance(load["target_cores"], int):

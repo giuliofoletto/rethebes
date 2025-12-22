@@ -42,7 +42,6 @@ class Actuator:
             self.controller.set_cpu_load(self.monitor.get_cpu_load())
             sleep_time = self.controller.get_sleep_time()
             self.generate_load(sleep_time)
-        return sleep_time
 
     def run_sequence(self, sequence):
         # Currently unused

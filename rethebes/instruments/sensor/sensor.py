@@ -54,7 +54,7 @@ class Sensor(Instrument):
             directory = self.path.parent.resolve()
             if not directory.exists():
                 directory.mkdir(parents=True)
-                logging.info("Created directory " + directory)
+                logging.info("Created directory " + str(directory))
             self.file = open(self.configuration["file_name"], "w", newline="")
             self.writer = csv.writer(self.file, delimiter=",")
             self.header_written = False
