@@ -20,6 +20,7 @@ dependencies = [
     "psutil",
     "hardwaremonitor==1.0.0",
     "pyzmq",
+    "rich",
 ]
 
 [project.scripts]
