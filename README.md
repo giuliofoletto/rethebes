@@ -17,18 +17,21 @@ With this repeatability, you can easily track and monitor the thermal performanc
 
 Some notable features of `rethebes` are:
 
--   Granular control of the CPU load, per physical core.
 -   All the measurements offered by [`LibreHardwareMonitorLib`](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor), such as temperature, load, power, frequency.
+-   Granular control of the CPU load, per physical core, so you can check the temperature response to different load conditions.
 -   Data saved in `.csv` format like that used by `LibreHardwareMonitor`.
 -   Visualization of measurement results after the test.
 
 ## Requirements
 
-`rethebes` should work on Windows 10+ and python 3.12.x or 3.13.x (3.14 not supported yet).
-It also requires [.NET Framework 4.7](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net47) to be installed (this is commonly true on Windows).
-All the other dependencies are automatically installed during the installation of `rethebes`.
-Note that `rethebes` uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`, which is downloaded automatically from pypi.
-The versions of some dependencies are pinned to guarantee compatibility, therefore it is recommended to install `rethebes` in a virtual environment or via `uv tool` (see below).
+`rethebes` requires:
+
+-   Windows 10 or 11;
+-   Python 3.12.x or 3.13.x;
+-   [.NET Framework 4.7](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net47);
+-   [PawnIO](https://pawnio.eu/), installed via `winget install namazso.PawnIO`.
+
+It also uses [`PyHardwareMonitor`](https://github.com/snip3rnick/PyHardwareMonitor), a wrapper for `LibreHardwareMonitorLib`, but that is installed automatically during the installation of `rethebes`, along with other python dependencies.
 
 ## Installation
 
@@ -104,7 +107,8 @@ will work if file `~/.rethebes/output/data.csv` exists.
 While developing `rethebes`, it is best to install it in an editable manner so that code changes are instantly available in the executed code without reinstallation:
 
 ```
-pip install -e .
+uv venv
+uv pip install -e .
 ```
 
 The `tests` folder contains some tests that should be run in a non-elevated terminal with `pytest`.
